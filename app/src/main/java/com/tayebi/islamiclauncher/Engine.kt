@@ -65,7 +65,7 @@ sealed interface Dlg {
 /** Application-wide state holder. Lives as long as the process, so prayer alerts keep working in the background. */
 class Engine(val app: Application) {
     val s = Settings(app)
-    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + kotlinx.coroutines.CoroutineExceptionHandler { _, ex -> android.util.Log.e("Engine", "background error", ex) })
     val audio = AudioController(app, s)
     private val prayerRepo = PrayerRepo(s.sp)
     private val weatherRepo = WeatherRepo(s.sp)
@@ -92,6 +92,8 @@ class Engine(val app: Application) {
     private var lastPrayerAttempt = 0L
     private var lastWeatherAttempt = 0L
     private var lastAdhanKey = ""
+    private var lastAdhanStart = 0L
+    private val prayerKeys = listOf("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")
     private var prayerJob: Job? = null
     private var weatherJob: Job? = null
 
@@ -324,7 +326,6 @@ class Engine(val app: Application) {
         checkAdhan(n)
     }
 
-    private val prayerKeys = listOf("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")
 
     private fun checkAdhan(n: Long) {
         if (adhanBanner != null && !audio.adhanPlaying && lastAdhanStart > 0 && n - lastAdhanStart > 5_000) {
@@ -347,8 +348,6 @@ class Engine(val app: Application) {
             }
         }
     }
-
-    private var lastAdhanStart = 0L
 
     fun stopAdhan() {
         audio.stopAdhan()

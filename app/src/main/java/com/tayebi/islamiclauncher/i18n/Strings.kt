@@ -1,9 +1,7 @@
 package com.tayebi.islamiclauncher.i18n
 
 import java.time.LocalDate
-import java.time.chrono.HijrahDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoField
 import java.util.Locale
 
 private fun L(ar: String, fr: String, en: String) = arrayOf(ar, fr, en)
@@ -158,13 +156,32 @@ fun gregorianLine(d: LocalDate, lang: String): String =
     if (lang == "ar") "${AR_DAYS[d.dayOfWeek.value - 1]} ${d.dayOfMonth} ${AR_MONTHS[d.monthValue - 1]} ${d.year}"
     else d.format(DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", Locale(lang))).replaceFirstChar { it.uppercase() }
 
-/** Hijri date (Umm al-Qura), computed on-device so it always updates automatically; adj = manual day shift. */
+/** Hijri date, computed on-device; adj = manual day shift. Never throws. */
+private fun hijriParts(d: LocalDate): Triple<Int, Int, Int> {
+    try {
+        val cal = android.icu.util.IslamicCalendar()
+        cal.calculationType = android.icu.util.IslamicCalendar.CalculationType.ISLAMIC_UMALQURA
+        cal.timeInMillis = d.atTime(12, 0).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        return Triple(cal.get(android.icu.util.Calendar.DAY_OF_MONTH), cal.get(android.icu.util.Calendar.MONTH) + 1, cal.get(android.icu.util.Calendar.YEAR))
+    } catch (e: Throwable) {
+        // tabular civil algorithm fallback
+        val jd = d.toEpochDay() + 2440588L
+        var l = jd - 1948440L + 10632L
+        val n = (l - 1) / 10631L
+        l = l - 10631L * n + 354L
+        val j = ((10985L - l) / 5316L) * ((50L * l) / 17719L) + (l / 5670L) * ((43L * l) / 15238L)
+        l = l - ((30L - j) / 15L) * ((17719L * j) / 50L) - (j / 16L) * ((15238L * j) / 43L) + 29L
+        val m = (24L * l) / 709L
+        val day = l - (709L * m) / 24L
+        val year = 30L * n + j - 30L
+        return Triple(day.toInt(), m.toInt().coerceIn(1, 12), year.toInt())
+    }
+}
+
 fun hijriLine(d: LocalDate, adj: Int, lang: String): String {
-    val h = HijrahDate.from(d.plusDays(adj.toLong()))
-    val day = h.get(ChronoField.DAY_OF_MONTH)
-    val m = h.get(ChronoField.MONTH_OF_YEAR)
-    val y = h.get(ChronoField.YEAR)
-    return if (lang == "ar") "$day ${HIJRI_AR[m - 1]} $y هـ" else "$day ${HIJRI_LAT[m - 1]} $y AH"
+    val (day, m, y) = hijriParts(d.plusDays(adj.toLong()))
+    val mm = m.coerceIn(1, 12)
+    return if (lang == "ar") "$day ${HIJRI_AR[mm - 1]} $y هـ" else "$day ${HIJRI_LAT[mm - 1]} $y AH"
 }
 
 fun weatherText(code: Int, lang: String): String {

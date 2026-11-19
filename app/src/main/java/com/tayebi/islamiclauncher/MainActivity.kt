@@ -23,6 +23,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val crash = java.io.File(filesDir, "crash.txt")
+        if (crash.exists()) {
+            val txt = crash.readText().take(3500)
+            crash.delete()
+            val tv = android.widget.TextView(this).apply {
+                text = "Last crash (send this text to the developer):\n\n$txt"
+                setTextColor(0xFFFFFFFF.toInt()); setBackgroundColor(0xFF000000.toInt()); textSize = 16f; setPadding(40, 40, 40, 40)
+            }
+            setContentView(android.widget.ScrollView(this).apply { addView(tv); isFocusable = true; isFocusableInTouchMode = true })
+            return
+        }
         engine = (application as App).engine
         WindowCompat.setDecorFitsSystemWindows(window, false)
         hideBars()
@@ -31,13 +42,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        hideBars()
+        if (::engine.isInitialized) hideBars()
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         // Pressing HOME on the remote returns to the launcher home screen.
-        if (intent.hasCategory(Intent.CATEGORY_HOME)) engine.go(Screen.Home)
+        if (::engine.isInitialized && intent.hasCategory(Intent.CATEGORY_HOME)) engine.go(Screen.Home)
     }
 
     private fun hideBars() {
