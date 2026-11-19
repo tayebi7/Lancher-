@@ -93,7 +93,9 @@ private class Row3(val title: String, val value: String, val action: () -> Unit)
 fun SettingsScreen(e: Engine) {
     val lang = LocalLang.current
     val net = openNetworkSettings()
+    val isHome = e.isDefaultHome()
     val rows = listOf(
+        Row3(s("launcher_status"), if (isHome) s("launcher_on") else s("launcher_off")) { e.openHomeChooser() },
         Row3(s("prayer_city"), e.prayerPlace().full()) { e.dlg = Dlg.City(CityTarget.Prayer) },
         Row3(s("weather_city"), if (e.s.weatherSame.value) s("same_as_prayer") else e.weatherPlace().full()) { e.dlg = Dlg.City(CityTarget.Weather) },
         Row3(s("same_as_prayer"), if (e.s.weatherSame.value) s("on") else s("off")) { e.setWeatherSame(!e.s.weatherSame.value) },
@@ -106,7 +108,7 @@ fun SettingsScreen(e: Engine) {
         Row3(s("hijri_adj"), e.s.hijriAdj.value.toString()) { e.dlg = Dlg.HijriAdj },
         Row3(s("volume"), "${e.s.volume.value}%") { e.dlg = Dlg.Volume },
         Row3(s("manage_fav"), e.favPkgs().size.toString()) { e.go(com.tayebi.islamiclauncher.Screen.Favorites) },
-        Row3(s("background"), s("bg_${e.s.bg.value}")) { e.dlg = Dlg.Bg },
+        Row3(s("background"), s("bg_${e.s.bg.value.coerceIn(0, 8)}")) { e.dlg = Dlg.Bg },
         Row3(s("language"), LANGS.first { it.first == lang }.second) { e.dlg = Dlg.Lang },
         Row3(s("internet"), if (e.online) s("connected") else s("disconnected")) { net() },
         Row3(s("refresh_now"), "⟳") { e.refreshAll() },

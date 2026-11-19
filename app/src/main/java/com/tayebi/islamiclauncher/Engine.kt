@@ -15,6 +15,7 @@ import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Looper
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -53,6 +54,7 @@ sealed interface Dlg {
     object Tune : Dlg
     object Lang : Dlg
     object Bg : Dlg
+    object BgUrl : Dlg
     object HijriAdj : Dlg
     object Volume : Dlg
     object AdhanUrl : Dlg
@@ -88,6 +90,7 @@ class Engine(val app: Application) {
 
     var installed by mutableStateOf<List<AppInfo>>(emptyList())
     var adhanBanner by mutableStateOf<String?>(null)
+    var customBg by mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null)
 
     private var lastPrayerAttempt = 0L
     private var lastWeatherAttempt = 0L
@@ -99,6 +102,7 @@ class Engine(val app: Application) {
 
     init {
         audio.onError = { toast(t(it)) }
+        loadCustomBg()
         watchNetwork()
         watchPackages()
         loadApps()
@@ -112,6 +116,69 @@ class Engine(val app: Application) {
         scope.launch {
             delay(3500)
             if (toast == msg) toast = null
+        }
+    }
+
+    // ---------- custom background ----------
+    private val bgFile get() = java.io.File(app.filesDir, "bg_custom.img")
+
+    private fun decodeBg(): androidx.compose.ui.graphics.ImageBitmap? = try {
+        val o = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        android.graphics.BitmapFactory.decodeFile(bgFile.path, o)
+        var sample = 1
+        while (o.outWidth / (sample * 2) >= 1920) sample *= 2
+        val bmp = android.graphics.BitmapFactory.decodeFile(bgFile.path, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample })
+        bmp?.asImageBitmap()
+    } catch (ex: Throwable) {
+        null
+    }
+
+    fun loadCustomBg() {
+        if (!bgFile.exists()) return
+        scope.launch { customBg = withContext(Dispatchers.IO) { decodeBg() } }
+    }
+
+    fun setBgFromUrl(url: String) {
+        scope.launch {
+            val ok = withContext(Dispatchers.IO) {
+                try {
+                    com.tayebi.islamiclauncher.data.Http.download(url, bgFile)
+                    decodeBg()
+                } catch (ex: Exception) {
+                    null
+                }
+            }
+            if (ok != null) {
+                customBg = ok
+                s.bg.set(8)
+            } else toast(t("bg_failed"))
+        }
+    }
+
+    // ---------- launcher (Home app) status ----------
+    fun isDefaultHome(): Boolean = try {
+        val i = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+        app.packageManager.resolveActivity(i, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName == app.packageName
+    } catch (ex: Exception) {
+        false
+    }
+
+    /** Android does not let an app silently become/stop being the Home app; open the system chooser/settings. */
+    fun openHomeChooser() {
+        toast(t("launcher_hint"))
+        val flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        try {
+            app.startActivity(Intent(android.provider.Settings.ACTION_HOME_SETTINGS).addFlags(flags))
+        } catch (ex: Exception) {
+            try {
+                // With no default set, pressing Home shows the "choose launcher" dialog.
+                app.startActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).addFlags(flags))
+            } catch (_: Exception) {
+                try {
+                    app.startActivity(Intent(android.provider.Settings.ACTION_SETTINGS).addFlags(flags))
+                } catch (_: Exception) {
+                }
+            }
         }
     }
 

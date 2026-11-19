@@ -28,7 +28,7 @@ fun LauncherApp(e: Engine, activity: MainActivity?) {
     BoxWithConstraints(Modifier.fillMaxSize().background(C.Navy)) {
         val u = maxWidth / 1920f
         CompositionLocalProvider(LocalU provides u, LocalLang provides lang, LocalLayoutDirection provides dir) {
-            AppBackground(e.s.bg.value)
+            AppBackground(e.s.bg.value, e.customBg)
             Row(Modifier.fillMaxSize()) {
                 Sidebar(e)
                 Box(Modifier.weight(1f).fillMaxHeight()) {

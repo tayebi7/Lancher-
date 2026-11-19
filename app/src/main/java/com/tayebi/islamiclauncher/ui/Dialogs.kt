@@ -260,6 +260,24 @@ fun AdhanUrlDialog(e: Engine) {
 }
 
 @Composable
+fun BgUrlDialog(e: Engine) {
+    var url by remember { mutableStateOf("https://") }
+    val fr = remember { FocusRequester() }
+    DialogShell(s("bg_url_title"), { e.dlg = null }, width = 1300) {
+        TextInput(url, { url = it }, "https://…/image.jpg", requester = fr)
+        Spacer(Modifier.height(16.u))
+        Row(horizontalArrangement = Arrangement.spacedBy(16.u)) {
+            Button(s("save"), Modifier.weight(1f)) { e.setBgFromUrl(url.trim()); e.dlg = null }
+            Button(s("cancel"), Modifier.weight(1f)) { e.dlg = null }
+        }
+    }
+    LaunchedEffect(Unit) {
+        delay(150)
+        runCatching { fr.requestFocus() }
+    }
+}
+
+@Composable
 fun DeveloperDialog(e: Engine) {
     val ctx = LocalContext.current
     val fr = remember { FocusRequester() }
@@ -321,9 +339,14 @@ fun Dialogs(e: Engine, activity: MainActivity?) {
             { e.s.lang.set(it); e.q.translations = emptyList(); e.h.english = emptyMap(); e.dlg = null }, { e.dlg = null }
         )
         Dlg.Bg -> ChoiceDialog(
-            s("background"), (0..2).map { it.toString() to s("bg_$it") }, e.s.bg.value.toString(),
-            { e.s.bg.set(it.toInt()); e.dlg = null }, { e.dlg = null }
+            s("background"),
+            (0..7).map { it.toString() to s("bg_$it") } +
+                (if (e.customBg != null) listOf("8" to s("bg_8")) else emptyList()) +
+                listOf("url" to s("bg_url")),
+            e.s.bg.value.toString(),
+            { if (it == "url") e.dlg = Dlg.BgUrl else { e.s.bg.set(it.toInt()); e.dlg = null } }, { e.dlg = null }
         )
+        Dlg.BgUrl -> BgUrlDialog(e)
         Dlg.HijriAdj -> ChoiceDialog(
             s("hijri_adj"), (-2..2).map { it.toString() to ((if (it > 0) "+" else "") + it + " " + s("day_unit")) }, e.s.hijriAdj.value.toString(),
             { e.s.hijriAdj.set(it.toInt()); e.dlg = null }, { e.dlg = null }

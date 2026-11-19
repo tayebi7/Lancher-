@@ -32,17 +32,24 @@ import kotlin.random.Random
  * To use a real photo, add app/src/main/res/drawable/bg_mosque.jpg – it is picked up automatically.
  */
 @Composable
-fun AppBackground(kind: Int) {
+fun AppBackground(kind: Int, custom: androidx.compose.ui.graphics.ImageBitmap? = null) {
     val ctx = LocalContext.current
     val resId = remember { ctx.resources.getIdentifier("bg_mosque", "drawable", ctx.packageName) }
     Box(Modifier.fillMaxSize()) {
-        if (kind == 0 && resId != 0) {
+        if (kind == 8 && custom != null) {
+            Image(custom, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+        } else if (kind == 0 && resId != 0) {
             Image(painterResource(resId), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         } else {
             Canvas(Modifier.fillMaxSize()) {
                 when (kind) {
                     0 -> scene(Color(0xFF040A20), Color(0xFF0B2A5B), Color(0xFF14486E), true)
                     1 -> scene(Color(0xFF03130F), Color(0xFF0A3B2E), Color(0xFF117055), true)
+                    3 -> scene(Color(0xFF14082B), Color(0xFF4A1F6B), Color(0xFF8A3A6B), true)
+                    4 -> scene(Color(0xFF1B1030), Color(0xFF8A4A3B), Color(0xFFE59A4A), true)
+                    5 -> { scene(Color(0xFF030818), Color(0xFF0B1F4A), Color(0xFF1C3A6B), false); dunes() }
+                    6 -> { drawRect(Brush.verticalGradient(listOf(Color(0xFF03130F), Color(0xFF0A4D3A), Color(0xFF062A21)))); lattice() }
+                    7 -> { drawRect(Brush.verticalGradient(listOf(Color(0xFF000000), Color(0xFF14110A), Color(0xFF000000)))); lattice() }
                     else -> {
                         drawRect(Brush.verticalGradient(listOf(Color(0xFF040A20), Color(0xFF0B2250), Color(0xFF06123A))))
                         lattice()
@@ -95,6 +102,23 @@ private fun DrawScope.scene(top: Color, mid: Color, low: Color, withMosque: Bool
             val x = w * (0.3f + rg.nextFloat() * 0.4f)
             drawLine(Color(0x33FFE2A0), Offset(x, y), Offset(x + w * 0.02f * rg.nextFloat(), y), strokeWidth = 1.5f * w / 1920f)
         }
+    }
+}
+
+private fun DrawScope.dunes() {
+    val w = size.width
+    val h = size.height
+    val layers = listOf(0.62f to Color(0xFF1A2340), 0.72f to Color(0xFF111A33), 0.84f to Color(0xFF080E22))
+    for ((y0, c) in layers) {
+        val p = Path().apply {
+            moveTo(0f, h)
+            lineTo(0f, h * y0)
+            cubicTo(w * 0.25f, h * (y0 - 0.12f), w * 0.45f, h * (y0 + 0.06f), w * 0.65f, h * (y0 - 0.05f))
+            cubicTo(w * 0.8f, h * (y0 - 0.1f), w * 0.9f, h * y0, w, h * (y0 - 0.04f))
+            lineTo(w, h)
+            close()
+        }
+        drawPath(p, c)
     }
 }
 
