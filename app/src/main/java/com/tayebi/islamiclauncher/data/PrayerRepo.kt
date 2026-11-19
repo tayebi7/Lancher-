@@ -42,7 +42,7 @@ class PrayerRepo(private val sp: SharedPreferences) {
         withContext(Dispatchers.IO) {
             val ym = YearMonth.from(d)
             val k = key(p, method, school, ym)
-            var map = sp.getString(k, null)?.let { runCatching { parse(it) }.getOrNull() }
+            var map: Map<LocalDate, List<LocalTime>>? = sp.getString(k, null)?.let { runCatching { parse(it) }.getOrNull() }
             if (map == null || d !in map) {
                 try {
                     val tz = URLEncoder.encode(p.tz, "UTF-8")
@@ -56,7 +56,7 @@ class PrayerRepo(private val sp: SharedPreferences) {
                     if (map == null) return@withContext null
                 }
             }
-            val base = map[d] ?: return@withContext null
+            val base = map?.get(d) ?: return@withContext null
             DayTimes(d, base.mapIndexed { i, t -> t.plusMinutes(tune.getOrElse(i) { 0 }.toLong()) })
         }
 }

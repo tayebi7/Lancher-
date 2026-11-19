@@ -34,10 +34,10 @@ class MainActivity : ComponentActivity() {
         hideBars()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         // Pressing HOME on the remote returns to the launcher home screen.
-        if (intent?.hasCategory(Intent.CATEGORY_HOME) == true) engine.go(Screen.Home)
+        if (intent.hasCategory(Intent.CATEGORY_HOME)) engine.go(Screen.Home)
     }
 
     private fun hideBars() {

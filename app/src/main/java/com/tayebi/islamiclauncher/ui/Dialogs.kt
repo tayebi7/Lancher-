@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -109,7 +110,7 @@ fun TextInput(value: String, onValue: (String) -> Unit, hint: String, modifier: 
     )
 }
 
-private fun Modifier.focusRequesterCompat(r: FocusRequester): Modifier = this.then(androidx.compose.ui.focus.focusRequester(r))
+private fun Modifier.focusRequesterCompat(r: FocusRequester): Modifier = this.then(focusRequester(r))
 
 @Composable
 fun ChoiceDialog(title: String, options: List<Pair<String, String>>, selected: String?, onPick: (String) -> Unit, onDismiss: () -> Unit) {
