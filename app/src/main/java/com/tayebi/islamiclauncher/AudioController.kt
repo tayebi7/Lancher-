@@ -29,7 +29,7 @@ class AudioController(private val ctx: Context, private val s: Settings) {
 
     private val adhanPlayer: ExoPlayer = ExoPlayer.Builder(ctx)
         .setAudioAttributes(
-            AudioAttributes.Builder().setUsage(C.USAGE_ALARM).setContentType(C.AUDIO_CONTENT_TYPE_SONIFICATION).build(), true
+            AudioAttributes.Builder().setUsage(C.USAGE_ALARM).setContentType(C.AUDIO_CONTENT_TYPE_SONIFICATION).build(), false
         )
         .build()
 
