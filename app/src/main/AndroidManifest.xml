@@ -42,6 +42,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:banner="@drawable/banner"
+            android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:stateNotNeeded="true"
@@ -59,6 +62,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".CrashActivity"
+            android:exported="false"
+            android:process=":crash"
+            android:excludeFromRecents="true" />
 
         <service
             android:name=".PlaybackService"

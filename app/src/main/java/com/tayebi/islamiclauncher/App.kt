@@ -1,27 +1,23 @@
 package com.tayebi.islamiclauncher
 
 import android.app.Application
-import java.io.File
+import android.content.Intent
+import android.os.Process
+import kotlin.system.exitProcess
 
 class App : Application() {
-    lateinit var engine: Engine
-        private set
+    /** Created lazily by MainActivity so a failure shows an error screen instead of a silent crash. */
+    val engine: Engine by lazy { Engine(this) }
 
     override fun onCreate() {
         super.onCreate()
-        val prev = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { t, e ->
+        Thread.setDefaultUncaughtExceptionHandler { _, e ->
             try {
-                File(filesDir, "crash.txt").writeText(android.util.Log.getStackTraceString(e))
+                CrashActivity.start(this, android.util.Log.getStackTraceString(e))
             } catch (_: Throwable) {
             }
-            prev?.uncaughtException(t, e)
-        }
-        try {
-            engine = Engine(this)
-        } catch (e: Throwable) {
-            File(filesDir, "crash.txt").writeText("Engine init failed:\n" + android.util.Log.getStackTraceString(e))
-            throw e
+            Process.killProcess(Process.myPid())
+            exitProcess(10)
         }
     }
 }

@@ -23,18 +23,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val crash = java.io.File(filesDir, "crash.txt")
-        if (crash.exists()) {
-            val txt = crash.readText().take(3500)
-            crash.delete()
-            val tv = android.widget.TextView(this).apply {
-                text = "Last crash (send this text to the developer):\n\n$txt"
-                setTextColor(0xFFFFFFFF.toInt()); setBackgroundColor(0xFF000000.toInt()); textSize = 16f; setPadding(40, 40, 40, 40)
-            }
-            setContentView(android.widget.ScrollView(this).apply { addView(tv); isFocusable = true; isFocusableInTouchMode = true })
+        try {
+            engine = (application as App).engine
+        } catch (t: Throwable) {
+            CrashActivity.start(this, "Engine init failed:\n" + android.util.Log.getStackTraceString(t))
+            finish()
             return
         }
-        engine = (application as App).engine
         WindowCompat.setDecorFitsSystemWindows(window, false)
         hideBars()
         setContent { LauncherApp(engine, this) }

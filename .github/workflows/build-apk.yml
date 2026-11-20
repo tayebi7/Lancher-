@@ -35,3 +35,39 @@ jobs:
           tag_name: latest
           name: Latest APK
           files: app/build/outputs/apk/release/*.apk
+
+  smoke-test:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: IslamicSmartTVLauncher-apk
+          path: apk
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run on Android TV emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: android-tv
+          arch: x86
+          profile: tv_1080p
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: true
+          script: bash ci/smoke.sh
+      - name: Publish screenshots to branch ci-screenshots
+        if: always()
+        run: |
+          mkdir -p shots && cp -r out/* shots/ 2>/dev/null || true
+          cd shots && git init -q && git checkout -q -b ci-screenshots
+          git config user.name "ci" && git config user.email "ci@users.noreply.github.com"
+          git add -A && git commit -q -m "emulator run" || true
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push -f origin ci-screenshots

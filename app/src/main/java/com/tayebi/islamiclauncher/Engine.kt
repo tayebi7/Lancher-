@@ -338,7 +338,11 @@ class Engine(val app: Application) {
     // ---------- background watchers ----------
     private fun watchNetwork() {
         val cm = app.getSystemService(ConnectivityManager::class.java) ?: return
-        online = cm.getNetworkCapabilities(cm.activeNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        online = try {
+            cm.activeNetwork?.let { cm.getNetworkCapabilities(it) }?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        } catch (_: Throwable) {
+            true
+        }
         try {
             cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
@@ -376,7 +380,7 @@ class Engine(val app: Application) {
                 nowMs = n
                 try {
                     housekeeping(n)
-                } catch (_: Exception) {
+                } catch (_: Throwable) {
                 }
                 delay(1000 - (n % 1000) + 5)
             }
