@@ -79,9 +79,9 @@ fun Sidebar(e: Engine) {
                 focusScale = 1.04f,
                 onClick = { e.go(sc) }
             ) {
-                Column(Modifier.fillMaxSize().padding(6.u), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    T(icon, 44, if (sel) C.Navy else C.GoldSoft)
-                    T(s(key), 22, if (sel) C.Navy else C.White, FontWeight.Bold, align = TextAlign.Center, maxLines = 2)
+                Column(Modifier.fillMaxSize().padding(2.u), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    T(icon, 32, if (sel) C.Navy else C.GoldSoft)
+                    T(s(key), 19, if (sel) C.Navy else C.White, FontWeight.Bold, align = TextAlign.Center, maxLines = 2)
                 }
             }
         }
@@ -150,23 +150,23 @@ fun PrayerPanel(e: Engine, modifier: Modifier = Modifier) {
     ) {
         Column(Modifier.fillMaxSize().padding(start = 40.u, end = 40.u, top = 6.u, bottom = 22.u)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                T("🕌", 40)
-                Spacer(Modifier.width(12.u))
-                T(s("prayer"), 40, C.Gold, FontWeight.Bold)
+                T("🕌", 30)
+                Spacer(Modifier.width(10.u))
+                T(s("prayer"), 32, C.Gold, FontWeight.Bold)
             }
-            Spacer(Modifier.height(10.u))
+            Spacer(Modifier.height(14.u))
             for (i in 0..5) {
                 val hi = next?.first == i
                 Row(
-                    Modifier.weight(1f).fillMaxWidth().padding(vertical = 2.u)
+                    Modifier.weight(1f).fillMaxWidth().padding(vertical = 1.u)
                         .background(if (hi) C.Emerald else Color(0x55000000), RoundedCornerShape(12.u))
                         .padding(horizontal = 18.u),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    T(s(PRAYER_KEYS[i]), 32, C.White, if (hi) FontWeight.Bold else FontWeight.Medium, Modifier.weight(1f))
-                    T(t?.t?.get(i)?.format(HM) ?: "--:--", 32, C.White, FontWeight.Bold)
-                    Spacer(Modifier.width(16.u))
-                    T(PRAYER_EMOJI[i], 30)
+                    T(s(PRAYER_KEYS[i]), 26, C.White, if (hi) FontWeight.Bold else FontWeight.Medium, Modifier.weight(1f), maxLines = 1)
+                    T(t?.t?.get(i)?.format(HM) ?: "--:--", 26, C.White, FontWeight.Bold, maxLines = 1)
+                    Spacer(Modifier.width(12.u))
+                    T(PRAYER_EMOJI[i], 24)
                 }
             }
             Spacer(Modifier.height(8.u))
@@ -175,8 +175,8 @@ fun PrayerPanel(e: Engine, modifier: Modifier = Modifier) {
             if (next != null) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        T(com.tayebi.islamiclauncher.i18n.trf("remaining_to", lang, s(PRAYER_KEYS[next.first])), 26, C.GoldSoft)
-                        T(fmtCountdown((next.second - e.nowMs) / 1000), 46, C.Gold, FontWeight.Bold)
+                        T(com.tayebi.islamiclauncher.i18n.trf("remaining_to", lang, s(PRAYER_KEYS[next.first])), 22, C.GoldSoft)
+                        T(fmtCountdown((next.second - e.nowMs) / 1000), 38, C.Gold, FontWeight.Bold)
                     }
                     T("⏱️", 40)
                 }
