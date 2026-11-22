@@ -148,7 +148,7 @@ fun PrayerPanel(e: Engine, modifier: Modifier = Modifier) {
         focusScale = 1.0f,
         onClick = { e.go(Screen.Prayer) }
     ) {
-        Column(Modifier.fillMaxSize().padding(start = 40.u, end = 40.u, top = 6.u, bottom = 22.u)) {
+        Column(Modifier.fillMaxSize().padding(start = 40.u, end = 40.u, top = 20.u, bottom = 22.u)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                 T("🕌", 30)
                 Spacer(Modifier.width(10.u))
