@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import kotlin.math.PI
 import kotlin.math.cos
@@ -253,7 +254,7 @@ private fun DrawScope.palm(x: Float, base: Float, ht: Float, lean: Float, col: C
 /** Fine golden geometric frame around the whole screen. */
 @Composable
 fun OrnamentFrame() {
-    val orn = androidx.compose.ui.res.imageResource(com.tayebi.islamiclauncher.R.drawable.ornament_gold)
+    val orn = androidx.compose.ui.graphics.ImageBitmap.imageResource(com.tayebi.islamiclauncher.R.drawable.ornament_gold)
     Canvas(Modifier.fillMaxSize()) {
         val w = size.width
         val h = size.height
