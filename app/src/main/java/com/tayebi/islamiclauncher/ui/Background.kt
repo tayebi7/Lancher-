@@ -1,5 +1,6 @@
 package com.tayebi.islamiclauncher.ui
 
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,7 +37,6 @@ import kotlin.random.Random
  * Background: a night mosque scene drawn in vector code (no copyrighted artwork).
  * To use a real photo, add app/src/main/res/drawable/bg_mosque.jpg – it is picked up automatically.
  */
-@Composable
 fun loadAssetBitmap(ctx: android.content.Context, name: String): androidx.compose.ui.graphics.ImageBitmap? = try {
     fun open() = ctx.assets.open("mosques/$name")
     val o = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -44,7 +44,7 @@ fun loadAssetBitmap(ctx: android.content.Context, name: String): androidx.compos
     var sample = 1
     while (o.outWidth / (sample * 2) >= 1920) sample *= 2
     open().use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }) }
-        ?.let { androidx.compose.ui.graphics.asImageBitmap(it) }
+        ?.asImageBitmap()
 } catch (t: Throwable) { null }
 
 fun listGalleryAssets(ctx: android.content.Context): List<String> = try {
