@@ -31,7 +31,7 @@ fun LauncherApp(e: Engine, activity: MainActivity?) {
             AppBackground(e.s.bg.value, e.customBg)
             Row(Modifier.fillMaxSize()) {
                 Sidebar(e)
-                Box(Modifier.weight(1f).fillMaxHeight()) {
+                Box(Modifier.weight(1f).fillMaxHeight().then(if (e.screen != Screen.Home) Modifier.background(Color(0xE6051029)) else Modifier)) {
                     when (e.screen) {
                         Screen.Home -> HomeScreen(e)
                         Screen.Apps -> AppsScreen(e)

@@ -74,7 +74,9 @@ fun AboutScreen(e: Engine) {
                     T("ادعم البرنامج  •  Support the app", 44, C.Gold, FontWeight.Bold)
                     Spacer(Modifier.height(6.u))
                     T("إن أعجبك البرنامج ويسرّك أن يستمر تطويره، فيمكنك دعمه بأي مبلغ تيسّر. جزاك الله خيراً.", 28, C.White)
-                    T("If you enjoy this app and would like to help keep it improving, you can support it with any amount. Thank you!", 26, C.GoldSoft)
+                    androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr) {
+                        T("If you enjoy this app and would like to help keep it improving, you can support it with any amount. Thank you!", 26, C.GoldSoft, modifier = Modifier.fillMaxWidth())
+                    }
                 }
             }
             items(PAYMENTS) { p ->
