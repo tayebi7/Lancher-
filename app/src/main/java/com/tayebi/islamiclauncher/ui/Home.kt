@@ -97,7 +97,7 @@ fun Clock(e: Engine) {
 fun TopBar(e: Engine) {
     val lang = LocalLang.current
     val today = Instant.ofEpochMilli(e.nowMs).atZone(ZoneId.systemDefault()).toLocalDate()
-    Row(Modifier.fillMaxWidth().height(120.u), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().height(110.u), verticalAlignment = Alignment.CenterVertically) {
         Column(horizontalAlignment = Alignment.Start) {
             T("📅  " + gregorianLine(today, lang), 30, C.White, FontWeight.Medium)
             Spacer(Modifier.height(4.u))
@@ -238,11 +238,16 @@ fun WeatherCard(e: Engine, modifier: Modifier = Modifier) {
 @Composable
 fun AppTile(app: AppInfo, modifier: Modifier, requester: FocusRequester? = null, onLong: (() -> Unit)? = null, onClick: () -> Unit) {
     FocusBox(modifier, shape = RoundedCornerShape(22.u), requester = requester, onLongClick = onLong, onClick = onClick) {
-        Column(Modifier.fillMaxSize().padding(10.u), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Column(Modifier.fillMaxSize().padding(8.u), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             val ic = app.icon
-            if (ic != null) Image(ic, app.label, Modifier.weight(1f).fillMaxWidth()) else T("📦", 60)
-            Spacer(Modifier.height(4.u))
-            T(app.label, 22, C.White, FontWeight.Medium, align = TextAlign.Center, maxLines = 1)
+            val bn = app.banner
+            if (bn != null) {
+                Image(bn, app.label, Modifier.weight(1f).fillMaxWidth(), contentScale = androidx.compose.ui.layout.ContentScale.Fit)
+            } else {
+                if (ic != null) Image(ic, app.label, Modifier.weight(1f).fillMaxWidth()) else T("📦", 60)
+                Spacer(Modifier.height(4.u))
+                T(app.label, 22, C.White, FontWeight.Medium, align = TextAlign.Center, maxLines = 1)
+            }
         }
     }
 }
@@ -298,11 +303,11 @@ fun BottomCards(e: Engine) {
     val quranBrush = Brush.horizontalGradient(listOf(Color(0xE60A3D31), Color(0xE6071A3E)))
     val hadithBrush = Brush.horizontalGradient(listOf(Color(0xE6341A5E), Color(0xE6071A3E)))
     val moreBrush = Brush.horizontalGradient(listOf(Color(0xE65A3A0E), Color(0xE6071A3E)))
-    Row(Modifier.fillMaxWidth().height(180.u), horizontalArrangement = Arrangement.spacedBy(20.u)) {
-        FeatureCard(s("more_apps"), "", "🧩", moreBrush, Modifier.weight(1f).fillMaxHeight(), extra = {
+    Row(Modifier.fillMaxWidth().height(170.u), horizontalArrangement = Arrangement.spacedBy(20.u)) {
+        FeatureCard(s("about_app"), "", "ℹ️", moreBrush, Modifier.weight(1f).fillMaxHeight(), extra = {
             T(DEV_NAME, 30, C.Gold, FontWeight.Bold, maxLines = 1)
-            T(DEV_EMAIL, 22, C.GoldSoft, maxLines = 1)
-        }) { e.dlg = Dlg.Developer }
+            T("🇩🇿 Algeria  •  " + s("more_apps"), 22, C.GoldSoft, maxLines = 1)
+        }) { e.go(Screen.About) }
         FeatureCard(s("hadith"), s("read_search"), "📜", hadithBrush, Modifier.weight(1f).fillMaxHeight()) { e.go(Screen.Hadith) }
         FeatureCard(s("quran"), s("read_listen"), "📖", quranBrush, Modifier.weight(1f).fillMaxHeight()) { e.go(Screen.Quran) }
     }
@@ -315,18 +320,21 @@ fun HomeScreen(e: Engine) {
         delay(150)
         runCatching { first.requestFocus() }
     }
-    Column(Modifier.fillMaxSize().padding(start = 30.u, end = 30.u, top = 34.u, bottom = 34.u)) {
+    Column(Modifier.fillMaxSize().padding(start = 34.u, end = 34.u, top = 52.u, bottom = 58.u)) {
         TopBar(e)
         Row(Modifier.weight(1f).fillMaxWidth().padding(vertical = 12.u), horizontalArrangement = Arrangement.spacedBy(20.u)) {
-            WeatherCard(e, Modifier.weight(0.28f).fillMaxHeight())
+            Column(Modifier.weight(0.28f).fillMaxHeight()) {
+                WeatherCard(e, Modifier.fillMaxWidth().weight(0.78f))
+                Spacer(Modifier.weight(0.22f))
+            }
             Spacer(Modifier.weight(0.42f))
             PrayerPanel(e, Modifier.weight(0.30f).fillMaxHeight())
         }
         AppsRow(e, first)
-        Spacer(Modifier.height(18.u))
+        Spacer(Modifier.height(14.u))
         BottomCards(e)
     }
 }
 
 const val DEV_NAME = "Tayebi Abdelghani"
-const val DEV_EMAIL = "tayebi4alum@gmail.com"
+const val DEV_EMAIL = "tayebi02@gmail.com"

@@ -32,6 +32,7 @@ class MainActivity : ComponentActivity() {
         }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         hideBars()
+        intent.getStringExtra("screen")?.let { n -> Screen.values().firstOrNull { it.name.equals(n, true) }?.let { engine.go(it) } }
         setContent { LauncherApp(engine, this) }
     }
 
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         // Pressing HOME on the remote returns to the launcher home screen.
         if (::engine.isInitialized && intent.hasCategory(Intent.CATEGORY_HOME)) engine.go(Screen.Home)
+        if (::engine.isInitialized) intent.getStringExtra("screen")?.let { n -> Screen.values().firstOrNull { it.name.equals(n, true) }?.let { engine.go(it) } }
     }
 
     private fun hideBars() {

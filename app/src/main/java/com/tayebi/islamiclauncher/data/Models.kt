@@ -38,7 +38,7 @@ data class Weather(
     val hi: Double, val lo: Double, val humidity: Int, val wind: Double, val updated: Long
 )
 
-data class AppInfo(val pkg: String, val label: String, val icon: ImageBitmap?)
+data class AppInfo(val pkg: String, val label: String, val icon: ImageBitmap?, val banner: ImageBitmap? = null)
 
 data class Chapter(val id: Int, val nameAr: String, val nameEn: String, val verses: Int, val place: String)
 data class Verse(val key: String, val text: String)

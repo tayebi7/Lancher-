@@ -108,11 +108,11 @@ fun SettingsScreen(e: Engine) {
         Row3(s("hijri_adj"), e.s.hijriAdj.value.toString()) { e.dlg = Dlg.HijriAdj },
         Row3(s("volume"), "${e.s.volume.value}%") { e.dlg = Dlg.Volume },
         Row3(s("manage_fav"), e.favPkgs().size.toString()) { e.go(com.tayebi.islamiclauncher.Screen.Favorites) },
-        Row3(s("background"), s("bg_${e.s.bg.value.coerceIn(0, 8)}")) { e.dlg = Dlg.Bg },
+        Row3(s("background"), s("bg_${e.s.bg.value.coerceIn(0, 10)}")) { e.dlg = Dlg.Bg },
         Row3(s("language"), LANGS.first { it.first == lang }.second) { e.dlg = Dlg.Lang },
         Row3(s("internet"), if (e.online) s("connected") else s("disconnected")) { net() },
         Row3(s("refresh_now"), "⟳") { e.refreshAll() },
-        Row3(s("more_apps"), "Tayebi Abdelghani") { e.dlg = Dlg.Developer }
+        Row3(s("about_app"), DEV_NAME) { e.go(com.tayebi.islamiclauncher.Screen.About) }
     )
     ScreenFrame(s("settings")) {
         LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.u)) {

@@ -19,7 +19,9 @@ grep -E "FATAL|AndroidRuntime|Engine|islamiclauncher" out/logcat_full.txt | head
 echo "=========== PID ==========="
 cat out/pid.txt
 # move focus around and capture more screens
-adb shell input keyevent KEYCODE_DPAD_DOWN; sleep 1
-adb exec-out screencap -p > out/screenshot-focus.png
-adb shell input keyevent KEYCODE_DPAD_RIGHT; sleep 1
+for sc in About Prayer Quran Hadith Settings Apps; do
+  adb shell am start -n $PKG/.MainActivity --es screen $sc
+  sleep 8
+  adb exec-out screencap -p > out/screenshot-$sc.png
+done
 exit 0

@@ -44,7 +44,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.coroutines.resume
 
-enum class Screen { Home, Apps, Favorites, Prayer, Quran, Hadith, Settings }
+enum class Screen { Home, Apps, Favorites, Prayer, Quran, Hadith, Settings, About }
 enum class CityTarget { Prayer, Weather }
 
 sealed interface Dlg {
@@ -286,14 +286,20 @@ class Engine(val app: Application) {
     }
 
     private fun ensureDefaultFavs() {
-        if (s.favorites.value != Settings.UNSET || installed.isEmpty()) return
+        if (installed.isEmpty()) return
+        if (s.favorites.value != Settings.UNSET && s.favVer.value >= 2) return
         val out = ArrayList<String>()
-        for (group in AppsRepo.DEFAULTS.take(4)) {
-            group.firstOrNull { p -> installed.any { it.pkg == p } }?.let { out.add(it) }
+        fun addFirst(group: List<String>) {
+            group.firstOrNull { p -> p !in out && installed.any { it.pkg == p } }?.let { out.add(it) }
         }
+        AppsRepo.DEFAULTS.take(4).forEach { addFirst(it) }
         installed.firstOrNull { it.label.contains("iptv", true) && it.pkg !in out }?.let { out.add(it.pkg) }
-        AppsRepo.DEFAULTS.last().firstOrNull { p -> installed.any { it.pkg == p } }?.let { out.add(it) }
-        s.favorites.set(out.joinToString("\n"))
+        addFirst(AppsRepo.DEFAULTS.last())
+        AppsRepo.EXTRAS.forEach { addFirst(listOf(it)) }
+        for (a in installed) if (out.size < 6 && a.banner != null && a.pkg !in out) out.add(a.pkg)
+        for (a in installed) if (out.size < 6 && a.pkg !in out) out.add(a.pkg)
+        s.favorites.set(out.take(6).joinToString("\n"))
+        s.favVer.set(2)
     }
 
     fun favPkgs(): List<String> {

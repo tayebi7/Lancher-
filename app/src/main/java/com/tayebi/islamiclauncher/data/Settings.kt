@@ -58,6 +58,7 @@ class Settings(ctx: Context) {
 
     // Apps
     val favorites = StrPref(sp, "favorites", UNSET)
+    val favVer = IntPref(sp, "fav_ver", 0)
 
     // Quran
     val reciter = IntPref(sp, "reciter", 7)

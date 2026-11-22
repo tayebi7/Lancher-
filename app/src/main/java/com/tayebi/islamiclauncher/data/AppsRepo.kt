@@ -22,7 +22,8 @@ class AppsRepo(private val ctx: Context) {
             AppInfo(
                 ri.activityInfo.packageName,
                 ri.loadLabel(pm).toString(),
-                runCatching { ri.loadIcon(pm).toBitmap(160, 160).asImageBitmap() }.getOrNull()
+                runCatching { ri.loadIcon(pm).toBitmap(160, 160).asImageBitmap() }.getOrNull(),
+                runCatching { ri.activityInfo.loadBanner(pm)?.toBitmap(320, 180)?.asImageBitmap() }.getOrNull()
             )
         }.sortedBy { it.label.lowercase() }
     }
@@ -35,6 +36,10 @@ class AppsRepo(private val ctx: Context) {
             listOf("net.mbc.shahid", "com.mbc.shahid"),
             listOf("com.disney.disneyplus"),
             listOf("com.android.vending")
+        )
+        val EXTRAS = listOf(
+            "com.amazon.amazonvideo.livingroom", "com.amazon.avod.thirdpartyclient", "org.xbmc.kodi",
+            "org.videolan.vlc", "com.spotify.tv.android", "com.google.android.youtube.tvmusic"
         )
     }
 }

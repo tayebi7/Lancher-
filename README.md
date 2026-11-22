@@ -18,4 +18,4 @@ Locally: `gradle :app:assembleRelease` → `app/build/outputs/apk/release/`.
 To use a real mosque photo as background, add `app/src/main/res/drawable/bg_mosque.jpg`.
 
 ## Developer
-Tayebi Abdelghani – tayebi4alum@gmail.com
+Tayebi Abdelghani – tayebi02@gmail.com

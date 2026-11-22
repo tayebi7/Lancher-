@@ -20,6 +20,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import kotlin.math.PI
@@ -34,17 +36,20 @@ import kotlin.random.Random
 @Composable
 fun AppBackground(kind: Int, custom: androidx.compose.ui.graphics.ImageBitmap? = null) {
     val ctx = LocalContext.current
-    val resId = remember { ctx.resources.getIdentifier("bg_mosque", "drawable", ctx.packageName) }
+    val resId = remember(kind) {
+        val n = when (kind) { 0 -> "bg_blue_gold"; 1 -> "bg_emerald"; else -> "" }
+        if (n.isEmpty()) 0 else ctx.resources.getIdentifier(n, "drawable", ctx.packageName)
+    }
     Box(Modifier.fillMaxSize()) {
         if (kind == 8 && custom != null) {
             Image(custom, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-        } else if (kind == 0 && resId != 0) {
+        } else if (resId != 0) {
             Image(painterResource(resId), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         } else {
             Canvas(Modifier.fillMaxSize()) {
                 when (kind) {
-                    0 -> scene(Color(0xFF040A20), Color(0xFF0B2A5B), Color(0xFF14486E), true)
-                    1 -> scene(Color(0xFF03130F), Color(0xFF0A3B2E), Color(0xFF117055), true)
+                    9 -> scene(Color(0xFF040A20), Color(0xFF0B2A5B), Color(0xFF14486E), true)
+                    10 -> scene(Color(0xFF03130F), Color(0xFF0A3B2E), Color(0xFF117055), true)
                     3 -> scene(Color(0xFF14082B), Color(0xFF4A1F6B), Color(0xFF8A3A6B), true)
                     4 -> scene(Color(0xFF1B1030), Color(0xFF8A4A3B), Color(0xFFE59A4A), true)
                     5 -> { scene(Color(0xFF030818), Color(0xFF0B1F4A), Color(0xFF1C3A6B), false); dunes() }
@@ -248,6 +253,7 @@ private fun DrawScope.palm(x: Float, base: Float, ht: Float, lean: Float, col: C
 /** Fine golden geometric frame around the whole screen. */
 @Composable
 fun OrnamentFrame() {
+    val orn = androidx.compose.ui.res.imageResource(com.tayebi.islamiclauncher.R.drawable.ornament_gold)
     Canvas(Modifier.fillMaxSize()) {
         val w = size.width
         val h = size.height
@@ -255,11 +261,12 @@ fun OrnamentFrame() {
         val g = Color(0xFFD9B44A)
         drawRoundRect(g.copy(alpha = 0.9f), Offset(8 * u, 8 * u), Size(w - 16 * u, h - 16 * u), CornerRadius(40 * u), style = Stroke(3 * u))
         drawRoundRect(g.copy(alpha = 0.4f), Offset(20 * u, 20 * u), Size(w - 40 * u, h - 40 * u), CornerRadius(30 * u), style = Stroke(1.5f * u))
-        var x = 120 * u
+        val tile = (34 * u).toInt().coerceAtLeast(8)
+        var x = (90 * u).toInt()
         while (x < w - 120 * u) {
-            star8(Offset(x, 14 * u), 6 * u, g.copy(alpha = 0.7f))
-            star8(Offset(x, h - 14 * u), 6 * u, g.copy(alpha = 0.7f))
-            x += 56 * u
+            drawImage(orn, IntOffset.Zero, IntSize(96, 96), IntOffset(x, (12 * u).toInt()), IntSize(tile, tile), alpha = 0.75f)
+            drawImage(orn, IntOffset.Zero, IntSize(96, 96), IntOffset(x, (h - 12 * u).toInt() - tile), IntSize(tile, tile), alpha = 0.75f)
+            x += tile
         }
         var y = 120 * u
         while (y < h - 120 * u) {
