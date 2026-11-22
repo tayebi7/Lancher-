@@ -281,33 +281,11 @@ private fun DrawScope.palm(x: Float, base: Float, ht: Float, lean: Float, col: C
     }
 }
 
-/** Fine golden geometric frame around the whole screen. */
+/** Golden Islamic frame (arches + lattice border) drawn over the whole screen – extracted from the user's template. */
 @Composable
 fun OrnamentFrame() {
-    val strip = androidx.compose.ui.graphics.ImageBitmap.imageResource(com.tayebi.islamiclauncher.R.drawable.ornament_strip)
+    val frame = androidx.compose.ui.graphics.ImageBitmap.imageResource(com.tayebi.islamiclauncher.R.drawable.frame_screen)
     Canvas(Modifier.fillMaxSize()) {
-        val w = size.width
-        val h = size.height
-        val u = w / 1920f
-        val g = Color(0xFFD9B44A)
-        drawRoundRect(g.copy(alpha = 0.9f), Offset(8 * u, 8 * u), Size(w - 16 * u, h - 16 * u), CornerRadius(40 * u), style = Stroke(3 * u))
-        drawRoundRect(g.copy(alpha = 0.4f), Offset(20 * u, 20 * u), Size(w - 40 * u, h - 40 * u), CornerRadius(30 * u), style = Stroke(1.5f * u))
-        val sh = (w * strip.height / strip.width.toFloat()).toInt()
-        val sw = (w - 24 * u).toInt()
-        drawImage(strip, IntOffset.Zero, IntSize(strip.width, strip.height), IntOffset((12 * u).toInt(), (h - 10 * u).toInt() - sh), IntSize(sw, sh), alpha = 0.95f)
-        withTransform({ scale(1f, -1f, Offset(0f, 10 * u + sh / 2f)) }) {
-            drawImage(strip, IntOffset.Zero, IntSize(strip.width, strip.height), IntOffset((12 * u).toInt(), (10 * u).toInt()), IntSize(sw, sh), alpha = 0.95f)
-        }
-        var y = 120 * u
-        while (y < h - 120 * u) {
-            star8(Offset(14 * u, y), 6 * u, g.copy(alpha = 0.7f))
-            star8(Offset(w - 14 * u, y), 6 * u, g.copy(alpha = 0.7f))
-            y += 56 * u
-        }
-        for (p in listOf(Offset(40 * u, 40 * u), Offset(w - 40 * u, 40 * u), Offset(40 * u, h - 40 * u), Offset(w - 40 * u, h - 40 * u))) {
-            star8(p, 26 * u, g.copy(alpha = 0.25f))
-            star8(p, 26 * u, g, false, 2 * u)
-            star8(p, 12 * u, g)
-        }
+        drawImage(frame, IntOffset.Zero, IntSize(frame.width, frame.height), IntOffset.Zero, IntSize(size.width.toInt(), size.height.toInt()), alpha = 0.97f)
     }
 }

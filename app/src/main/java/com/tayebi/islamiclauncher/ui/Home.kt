@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.imageResource
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -65,7 +66,7 @@ fun Sidebar(e: Engine) {
         Triple(Screen.Settings, "⚙️", "settings")
     )
     Column(
-        Modifier.width(210.u).fillMaxHeight().padding(vertical = 36.u, horizontal = 14.u),
+        Modifier.width(210.u).fillMaxHeight().padding(top = 92.u, bottom = 70.u, start = 14.u, end = 14.u),
         verticalArrangement = Arrangement.spacedBy(10.u)
     ) {
         for ((sc, icon, key) in items) {
@@ -137,15 +138,17 @@ fun PrayerPanel(e: Engine, modifier: Modifier = Modifier) {
     val lang = LocalLang.current
     val next = e.nextPrayer()
     val t = e.today
+    val frame = androidx.compose.ui.graphics.ImageBitmap.imageResource(com.tayebi.islamiclauncher.R.drawable.frame_prayer)
+    Box(modifier.padding(top = 40.u)) {
     FocusBox(
-        modifier,
-        shape = RoundedCornerShape(30.u),
-        bg = Color(0xD9062A22),
+        Modifier.fillMaxSize(),
+        shape = RoundedCornerShape(26.u),
+        bg = Color(0xE5063226),
         focusBg = Color(0xF00A3D31),
-        focusScale = 1.02f,
+        focusScale = 1.0f,
         onClick = { e.go(Screen.Prayer) }
     ) {
-        Column(Modifier.fillMaxSize().padding(horizontal = 26.u, vertical = 18.u)) {
+        Column(Modifier.fillMaxSize().padding(start = 40.u, end = 40.u, top = 6.u, bottom = 22.u)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                 T("🕌", 40)
                 Spacer(Modifier.width(12.u))
@@ -182,6 +185,15 @@ fun PrayerPanel(e: Engine, modifier: Modifier = Modifier) {
             }
             if (!e.online && t != null) StaleLine(e.prayerUpdatedMs())
         }
+    }
+    androidx.compose.foundation.Canvas(Modifier.matchParentSize()) {
+        val w = size.width; val h = size.height
+        drawImage(
+            frame, androidx.compose.ui.unit.IntOffset.Zero, androidx.compose.ui.unit.IntSize(frame.width, frame.height),
+            androidx.compose.ui.unit.IntOffset((-w * 12 / 673).toInt(), (-h * 80 / 640).toInt()),
+            androidx.compose.ui.unit.IntSize((w * 705 / 673).toInt(), (h * 720 / 640).toInt())
+        )
+    }
     }
 }
 
@@ -318,7 +330,7 @@ fun HomeScreen(e: Engine) {
         delay(150)
         runCatching { first.requestFocus() }
     }
-    Column(Modifier.fillMaxSize().padding(start = 34.u, end = 34.u, top = 52.u, bottom = 58.u)) {
+    Column(Modifier.fillMaxSize().padding(start = 34.u, end = 34.u, top = 66.u, bottom = 66.u)) {
         TopBar(e)
         Row(Modifier.weight(1f).fillMaxWidth().padding(vertical = 12.u), horizontalArrangement = Arrangement.spacedBy(20.u)) {
             Column(Modifier.weight(0.28f).fillMaxHeight()) {

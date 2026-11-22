@@ -30,7 +30,7 @@ import java.util.Locale
 
 @Composable
 fun ScreenFrame(title: String, content: @Composable () -> Unit) {
-    Column(Modifier.fillMaxSize().padding(start = 40.u, end = 40.u, top = 40.u, bottom = 40.u)) {
+    Column(Modifier.fillMaxSize().padding(start = 56.u, end = 40.u, top = 80.u, bottom = 70.u)) {
         T(title, 56, C.Gold, FontWeight.Bold)
         Spacer(Modifier.height(18.u))
         content()
