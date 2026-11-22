@@ -246,6 +246,7 @@ class Engine(val app: Application) {
 
     // ---------- navigation ----------
     fun go(sc: Screen) {
+        if (sc == Screen.Background) { openBgScreen(); return }
         screen = sc
         if (sc == Screen.Quran) q.loadChapters()
     }
