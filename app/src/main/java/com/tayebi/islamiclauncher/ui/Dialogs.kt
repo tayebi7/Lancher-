@@ -340,7 +340,7 @@ fun Dialogs(e: Engine, activity: MainActivity?) {
         )
         Dlg.Bg -> ChoiceDialog(
             s("background"),
-            (listOf(0, 1, 9, 10, 2, 3, 4, 5, 6, 7)).map { it.toString() to s("bg_$it") } +
+            (listOf(11, 0, 1, 9, 10, 2, 3, 4, 5, 6, 7)).map { it.toString() to s("bg_$it") } +
                 (if (e.customBg != null) listOf("8" to s("bg_8")) else emptyList()) +
                 listOf("url" to s("bg_url")),
             e.s.bg.value.toString(),

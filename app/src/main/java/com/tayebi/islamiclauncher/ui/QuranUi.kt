@@ -134,7 +134,7 @@ private fun Reader(e: Engine) {
                     FocusBox(Modifier.fillMaxWidth(), focusScale = 1f, bg = Color(0x77081A3C), onClick = { q.togglePlay() }) { f ->
                         if (f) q.savePosition(i)
                         Column(Modifier.fillMaxWidth().padding(24.u)) {
-                            T(v.text + "  ﴿" + arabicDigits(num) + "﴾", 44, C.White, FontWeight.Medium, Modifier.fillMaxWidth())
+                            T(v.text + "  ﴿" + arabicDigits(num) + "﴾", 44, C.White, FontWeight.Medium, Modifier.fillMaxWidth(), font = Fonts.Quran)
                             q.translations.getOrNull(i)?.takeIf { e.s.showTr.value && it.isNotBlank() }?.let {
                                 Spacer(Modifier.height(8.u)); T(it, 26, C.GoldSoft, modifier = Modifier.fillMaxWidth(), align = TextAlign.Start)
                             }

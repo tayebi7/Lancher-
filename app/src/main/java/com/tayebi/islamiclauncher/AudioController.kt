@@ -108,6 +108,14 @@ class AudioController(private val ctx: Context, private val s: Settings) {
         player.play()
     }
 
+    fun playStream(uri: Uri) {
+        surah = 0
+        applyVolume()
+        player.setMediaItem(MediaItem.fromUri(uri))
+        player.prepare()
+        player.play()
+    }
+
     fun toggle() {
         if (player.isPlaying) player.pause() else player.play()
     }

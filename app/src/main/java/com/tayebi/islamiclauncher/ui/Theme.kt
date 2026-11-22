@@ -29,7 +29,10 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import com.tayebi.islamiclauncher.R
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -63,6 +66,17 @@ fun s(key: String): String = com.tayebi.islamiclauncher.i18n.tr(key, LocalLang.c
 @Composable
 fun sf(key: String, vararg a: Any): String = com.tayebi.islamiclauncher.i18n.trf(key, LocalLang.current, *a)
 
+object Fonts {
+    val UI = FontFamily(
+        Font(R.font.tajawal_regular, FontWeight.Normal),
+        Font(R.font.tajawal_medium, FontWeight.Medium),
+        Font(R.font.tajawal_bold, FontWeight.Bold),
+        Font(R.font.tajawal_bold, FontWeight.SemiBold)
+    )
+    val Quran = FontFamily(Font(R.font.amiri_regular, FontWeight.Normal), Font(R.font.amiri_regular, FontWeight.Medium))
+    val Head = FontFamily(Font(R.font.cairo, FontWeight.Normal), Font(R.font.cairo, FontWeight.Bold))
+}
+
 @Composable
 fun T(
     text: String,
@@ -71,9 +85,11 @@ fun T(
     weight: FontWeight = FontWeight.Normal,
     modifier: Modifier = Modifier,
     align: TextAlign? = null,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    font: FontFamily = Fonts.UI
 ) {
     Text(
+        fontFamily = font,
         text = text,
         modifier = modifier,
         color = color,

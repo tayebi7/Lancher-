@@ -40,7 +40,7 @@ class Settings(ctx: Context) {
     val sp: SharedPreferences = ctx.getSharedPreferences("islamic_launcher", Context.MODE_PRIVATE)
 
     val lang = StrPref(sp, "lang", "ar")
-    val bg = IntPref(sp, "bg", 0)
+    val bg = IntPref(sp, "bg", 11)
     val volume = IntPref(sp, "volume", 80)
 
     // Prayer

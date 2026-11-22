@@ -61,6 +61,7 @@ fun Sidebar(e: Engine) {
         Triple(Screen.Prayer, "🕌", "prayer"),
         Triple(Screen.Quran, "📖", "quran"),
         Triple(Screen.Hadith, "📜", "hadith"),
+        Triple(Screen.Radio, "📻", "radio"),
         Triple(Screen.Settings, "⚙️", "settings")
     )
     Column(

@@ -44,7 +44,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.coroutines.resume
 
-enum class Screen { Home, Apps, Favorites, Prayer, Quran, Hadith, Settings, About }
+enum class Screen { Home, Apps, Favorites, Prayer, Quran, Hadith, Radio, Settings, About }
 enum class CityTarget { Prayer, Weather }
 
 sealed interface Dlg {
@@ -74,6 +74,7 @@ class Engine(val app: Application) {
     private val appsRepo = AppsRepo(app)
     val q = QuranState(this)
     val h = HadithState(this)
+    val radio = RadioState(this)
 
     var screen by mutableStateOf(Screen.Home)
     var dlg by mutableStateOf<Dlg?>(null)

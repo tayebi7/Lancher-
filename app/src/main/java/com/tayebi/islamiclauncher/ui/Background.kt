@@ -38,7 +38,7 @@ import kotlin.random.Random
 fun AppBackground(kind: Int, custom: androidx.compose.ui.graphics.ImageBitmap? = null) {
     val ctx = LocalContext.current
     val resId = remember(kind) {
-        val n = when (kind) { 0 -> "bg_blue_gold"; 1 -> "bg_emerald"; else -> "" }
+        val n = when (kind) { 0 -> "bg_blue_gold"; 1 -> "bg_emerald"; 11 -> "bg_mosque"; else -> "" }
         if (n.isEmpty()) 0 else ctx.resources.getIdentifier(n, "drawable", ctx.packageName)
     }
     Box(Modifier.fillMaxSize()) {

@@ -39,6 +39,7 @@ fun LauncherApp(e: Engine, activity: MainActivity?) {
                         Screen.Prayer -> PrayerScreen(e)
                         Screen.Quran -> QuranScreen(e)
                         Screen.Hadith -> HadithScreen(e)
+                        Screen.Radio -> RadioScreen(e)
                         Screen.Settings -> SettingsScreen(e)
                         Screen.About -> AboutScreen(e)
                     }
