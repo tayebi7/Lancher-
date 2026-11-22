@@ -305,10 +305,7 @@ fun BottomCards(e: Engine) {
     val hadithBrush = Brush.horizontalGradient(listOf(Color(0xE6341A5E), Color(0xE6071A3E)))
     val moreBrush = Brush.horizontalGradient(listOf(Color(0xE65A3A0E), Color(0xE6071A3E)))
     Row(Modifier.fillMaxWidth().height(170.u), horizontalArrangement = Arrangement.spacedBy(20.u)) {
-        FeatureCard(s("about_app"), "", "ℹ️", moreBrush, Modifier.weight(1f).fillMaxHeight(), extra = {
-            T(DEV_NAME, 30, C.Gold, FontWeight.Bold, maxLines = 1)
-            T("🇩🇿 Algeria  •  " + s("more_apps"), 22, C.GoldSoft, maxLines = 1)
-        }) { e.go(Screen.About) }
+        FeatureCard(s("about_app"), "", "ℹ️", moreBrush, Modifier.weight(1f).fillMaxHeight()) { e.go(Screen.About) }
         FeatureCard(s("hadith"), s("read_search"), "📜", hadithBrush, Modifier.weight(1f).fillMaxHeight()) { e.go(Screen.Hadith) }
         FeatureCard(s("quran"), s("read_listen"), "📖", quranBrush, Modifier.weight(1f).fillMaxHeight()) { e.go(Screen.Quran) }
     }

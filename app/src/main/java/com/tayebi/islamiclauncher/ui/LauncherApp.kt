@@ -27,8 +27,8 @@ fun LauncherApp(e: Engine, activity: MainActivity?) {
     BackHandler(enabled = true) { e.back() }
     BoxWithConstraints(Modifier.fillMaxSize().background(C.Navy)) {
         val u = maxWidth / 1920f
-        CompositionLocalProvider(LocalU provides u, LocalLang provides lang, LocalLayoutDirection provides dir) {
-            AppBackground(e.s.bg.value, e.customBg)
+        CompositionLocalProvider(LocalU provides u, LocalLang provides lang, LocalLayoutDirection provides dir, LocalFont provides Fonts.all[e.s.font.value.coerceIn(0, Fonts.COUNT - 1)]) {
+            AppBackground(e.s.bg.value, e.customBg, e.s.bgAsset.value, e.s.bgMode.value, e.s.bgDim.value)
             Row(Modifier.fillMaxSize()) {
                 Sidebar(e)
                 Box(Modifier.weight(1f).fillMaxHeight().then(if (e.screen != Screen.Home) Modifier.background(Color(0xE6051029)) else Modifier)) {
@@ -41,6 +41,7 @@ fun LauncherApp(e: Engine, activity: MainActivity?) {
                         Screen.Hadith -> HadithScreen(e)
                         Screen.Radio -> RadioScreen(e)
                         Screen.Settings -> SettingsScreen(e)
+                        Screen.Background -> BgScreen(e)
                         Screen.About -> AboutScreen(e)
                     }
                 }

@@ -41,6 +41,10 @@ class Settings(ctx: Context) {
 
     val lang = StrPref(sp, "lang", "ar")
     val bg = IntPref(sp, "bg", 11)
+    val bgAsset = StrPref(sp, "bg_asset", "")
+    val bgMode = IntPref(sp, "bg_mode", 0)
+    val bgDim = IntPref(sp, "bg_dim", 0)
+    val font = IntPref(sp, "font", 0)
     val volume = IntPref(sp, "volume", 80)
 
     // Prayer

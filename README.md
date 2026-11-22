@@ -18,7 +18,9 @@ An Islamic launcher for Android TV / Google TV box. Kotlin + Jetpack Compose, mi
 - القرآن الكريم (نص، ترجمة، تفسير، تلاوة، بحث) — Quran.com API
 - الأحاديث النبوية (مصادر مشتقة من sunnah.com، تُخزَّن للعمل دون اتصال)
 - **الراديو**: إذاعات القرآن (mp3quran.net) وإذاعات إسلامية وجزائرية (radio-browser.info)
-- التطبيقات المثبتة + المفضلة، خلفيات متعددة (صورة مسجد، صورة مخصصة)، زخارف ذهبية
+- التطبيقات المثبتة + المفضلة، زخارف ذهبية
+- **تغيير خلفية الشاشة** (الإعدادات): خلفيات افتراضية، معرض صور المساجد (`app/src/main/assets/mosques/`)، اختيار صورة من الجهاز/USB عبر Android Storage Access Framework، معاينة قبل الاعتماد، اعتماد/إلغاء/استعادة الافتراضية، أوضاع العرض (اقتصاص / احتواء / تمديد) وتعتيم، ويُحفظ الاختيار بعد إعادة التشغيل
+- **الخطوط** (الإعدادات ← نوع الخط): نسخ (افتراضي)، كوفي، ريم كوفي، المسيري، تجوّل، القاهرة، أميري
 - يعمل كـ Launcher افتراضي (Home) أو كتطبيق عادي
 - بلا إعلانات، بلا بيانات وهمية، يتعامل مع غياب الإنترنت
 
@@ -30,7 +32,7 @@ An Islamic launcher for Android TV / Google TV box. Kotlin + Jetpack Compose, mi
 Aladhan · Open-Meteo · BigDataCloud · Quran.com v4 · fawazahmed0/hadith-api · mp3quran.net · radio-browser.info
 
 ## الخطوط والتراخيص / Fonts & licenses
-Cairo، Tajawal، Amiri — رخصة SIL OFL 1.1 (انظر مجلد `licenses/`).
+Noto Naskh Arabic، Noto Kufi Arabic، Reem Kufi، El Messiri، Tajawal، Cairo، Amiri — رخصة SIL OFL 1.1 (انظر مجلد `licenses/`).
 
 ## المطوّر / Developer
 **Tayebi Abdelghani** — 🇩🇿 Algeria — tayebi02@gmail.com

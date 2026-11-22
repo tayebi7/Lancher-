@@ -338,6 +338,10 @@ fun Dialogs(e: Engine, activity: MainActivity?) {
             s("language"), LANGS, e.s.lang.value,
             { e.s.lang.set(it); e.q.translations = emptyList(); e.h.english = emptyMap(); e.dlg = null }, { e.dlg = null }
         )
+        Dlg.Font -> ChoiceDialog(
+            s("font"), (0 until Fonts.COUNT).map { it.toString() to s("font_$it") }, e.s.font.value.toString(),
+            { e.s.font.set(it.toInt()); e.dlg = null }, { e.dlg = null }
+        )
         Dlg.Bg -> ChoiceDialog(
             s("background"),
             (listOf(11, 0, 1, 9, 10, 2, 3, 4, 5, 6, 7)).map { it.toString() to s("bg_$it") } +

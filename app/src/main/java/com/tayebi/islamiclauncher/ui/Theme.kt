@@ -66,16 +66,33 @@ fun s(key: String): String = com.tayebi.islamiclauncher.i18n.tr(key, LocalLang.c
 @Composable
 fun sf(key: String, vararg a: Any): String = com.tayebi.islamiclauncher.i18n.trf(key, LocalLang.current, *a)
 
+@OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
+private fun vf(res: Int): FontFamily = FontFamily(
+    listOf(400 to FontWeight.Normal, 500 to FontWeight.Medium, 600 to FontWeight.SemiBold, 700 to FontWeight.Bold).map { (w, fw) ->
+        Font(res, fw, variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(androidx.compose.ui.text.font.FontVariation.weight(w)))
+    }
+)
+
 object Fonts {
-    val UI = FontFamily(
+    val Tajawal = FontFamily(
         Font(R.font.tajawal_regular, FontWeight.Normal),
         Font(R.font.tajawal_medium, FontWeight.Medium),
         Font(R.font.tajawal_bold, FontWeight.Bold),
         Font(R.font.tajawal_bold, FontWeight.SemiBold)
     )
     val Quran = FontFamily(Font(R.font.amiri_regular, FontWeight.Normal), Font(R.font.amiri_regular, FontWeight.Medium))
-    val Head = FontFamily(Font(R.font.cairo, FontWeight.Normal), Font(R.font.cairo, FontWeight.Bold))
+    val Naskh = vf(R.font.noto_naskh)
+    val Kufi = vf(R.font.noto_kufi)
+    val ReemKufi = vf(R.font.reem_kufi)
+    val Messiri = vf(R.font.el_messiri)
+    val Cairo = vf(R.font.cairo)
+
+    /** Index = value of the "font" setting. 0 (Naskh) is the default. */
+    val all: List<FontFamily> by lazy { listOf(Naskh, Kufi, ReemKufi, Messiri, Tajawal, Cairo, Quran) }
+    const val COUNT = 7
 }
+
+val LocalFont = compositionLocalOf<FontFamily> { Fonts.Tajawal }
 
 @Composable
 fun T(
@@ -86,10 +103,10 @@ fun T(
     modifier: Modifier = Modifier,
     align: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
-    font: FontFamily = Fonts.UI
+    font: FontFamily? = null
 ) {
     Text(
-        fontFamily = font,
+        fontFamily = font ?: LocalFont.current,
         text = text,
         modifier = modifier,
         color = color,

@@ -2,6 +2,8 @@ package com.tayebi.islamiclauncher.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -35,17 +37,44 @@ import kotlin.random.Random
  * To use a real photo, add app/src/main/res/drawable/bg_mosque.jpg – it is picked up automatically.
  */
 @Composable
-fun AppBackground(kind: Int, custom: androidx.compose.ui.graphics.ImageBitmap? = null) {
+fun loadAssetBitmap(ctx: android.content.Context, name: String): androidx.compose.ui.graphics.ImageBitmap? = try {
+    fun open() = ctx.assets.open("mosques/$name")
+    val o = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    open().use { android.graphics.BitmapFactory.decodeStream(it, null, o) }
+    var sample = 1
+    while (o.outWidth / (sample * 2) >= 1920) sample *= 2
+    open().use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }) }
+        ?.let { androidx.compose.ui.graphics.asImageBitmap(it) }
+} catch (t: Throwable) { null }
+
+fun listGalleryAssets(ctx: android.content.Context): List<String> = try {
+    (ctx.assets.list("mosques") ?: emptyArray()).filter { it.substringAfterLast('.').lowercase() in setOf("png", "jpg", "jpeg", "webp") }.sorted()
+} catch (t: Throwable) { emptyList() }
+
+@Composable
+fun AppBackground(
+    kind: Int,
+    custom: androidx.compose.ui.graphics.ImageBitmap? = null,
+    asset: String = "",
+    mode: Int = 0,
+    dim: Int = 0
+) {
     val ctx = LocalContext.current
+    val scale = when (mode) { 1 -> ContentScale.Fit; 2 -> ContentScale.FillBounds; else -> ContentScale.Crop }
+    val assetBmp by androidx.compose.runtime.produceState<androidx.compose.ui.graphics.ImageBitmap?>(null, kind, asset) {
+        value = if (kind == 12 && asset.isNotEmpty()) kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { loadAssetBitmap(ctx, asset) } else null
+    }
     val resId = remember(kind) {
         val n = when (kind) { 0 -> "bg_blue_gold"; 1 -> "bg_emerald"; 11 -> "bg_mosque"; else -> "" }
         if (n.isEmpty()) 0 else ctx.resources.getIdentifier(n, "drawable", ctx.packageName)
     }
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize().background(Color(0xFF040A20))) {
         if (kind == 8 && custom != null) {
-            Image(custom, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+            Image(custom, null, Modifier.fillMaxSize(), contentScale = scale)
+        } else if (kind == 12) {
+            assetBmp?.let { Image(it, null, Modifier.fillMaxSize(), contentScale = scale) }
         } else if (resId != 0) {
-            Image(painterResource(resId), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+            Image(painterResource(resId), null, Modifier.fillMaxSize(), contentScale = scale)
         } else {
             Canvas(Modifier.fillMaxSize()) {
                 when (kind) {
@@ -66,6 +95,7 @@ fun AppBackground(kind: Int, custom: androidx.compose.ui.graphics.ImageBitmap? =
         Canvas(Modifier.fillMaxSize()) {
             drawRect(Brush.verticalGradient(listOf(Color(0x33000000), Color(0x00000000), Color(0x66000000))))
         }
+        if (dim > 0) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = listOf(0f, 0.25f, 0.45f, 0.65f)[dim.coerceIn(0, 3)])))
     }
 }
 
@@ -254,7 +284,7 @@ private fun DrawScope.palm(x: Float, base: Float, ht: Float, lean: Float, col: C
 /** Fine golden geometric frame around the whole screen. */
 @Composable
 fun OrnamentFrame() {
-    val orn = androidx.compose.ui.graphics.ImageBitmap.imageResource(com.tayebi.islamiclauncher.R.drawable.ornament_gold)
+    val strip = androidx.compose.ui.graphics.ImageBitmap.imageResource(com.tayebi.islamiclauncher.R.drawable.ornament_strip)
     Canvas(Modifier.fillMaxSize()) {
         val w = size.width
         val h = size.height
@@ -262,12 +292,11 @@ fun OrnamentFrame() {
         val g = Color(0xFFD9B44A)
         drawRoundRect(g.copy(alpha = 0.9f), Offset(8 * u, 8 * u), Size(w - 16 * u, h - 16 * u), CornerRadius(40 * u), style = Stroke(3 * u))
         drawRoundRect(g.copy(alpha = 0.4f), Offset(20 * u, 20 * u), Size(w - 40 * u, h - 40 * u), CornerRadius(30 * u), style = Stroke(1.5f * u))
-        val tile = (34 * u).toInt().coerceAtLeast(8)
-        var x = (90 * u).toInt()
-        while (x < w - 120 * u) {
-            drawImage(orn, IntOffset.Zero, IntSize(96, 96), IntOffset(x, (12 * u).toInt()), IntSize(tile, tile), alpha = 0.75f)
-            drawImage(orn, IntOffset.Zero, IntSize(96, 96), IntOffset(x, (h - 12 * u).toInt() - tile), IntSize(tile, tile), alpha = 0.75f)
-            x += tile
+        val sh = (w * strip.height / strip.width.toFloat()).toInt()
+        val sw = (w - 24 * u).toInt()
+        drawImage(strip, IntOffset.Zero, IntSize(strip.width, strip.height), IntOffset((12 * u).toInt(), (h - 10 * u).toInt() - sh), IntSize(sw, sh), alpha = 0.95f)
+        withTransform({ scale(1f, -1f, Offset(0f, 10 * u + sh / 2f)) }) {
+            drawImage(strip, IntOffset.Zero, IntSize(strip.width, strip.height), IntOffset((12 * u).toInt(), (10 * u).toInt()), IntSize(sw, sh), alpha = 0.95f)
         }
         var y = 120 * u
         while (y < h - 120 * u) {

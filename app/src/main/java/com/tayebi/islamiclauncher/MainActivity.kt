@@ -21,6 +21,16 @@ class MainActivity : ComponentActivity() {
         locCb = null
     }
 
+    private val imagePicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            try {
+                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } catch (_: Exception) {
+            }
+            engine.onImagePicked(uri)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
@@ -30,10 +40,22 @@ class MainActivity : ComponentActivity() {
             finish()
             return
         }
+        engine.pickImageLauncher = {
+            try {
+                imagePicker.launch(arrayOf("image/png", "image/jpeg", "image/webp"))
+            } catch (e: Exception) {
+                engine.toast(engine.t("no_file_browser"))
+            }
+        }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         hideBars()
         intent.getStringExtra("screen")?.let { n -> Screen.values().firstOrNull { it.name.equals(n, true) }?.let { engine.go(it) } }
         setContent { LauncherApp(engine, this) }
+    }
+
+    override fun onDestroy() {
+        if (::engine.isInitialized) engine.pickImageLauncher = null
+        super.onDestroy()
     }
 
     override fun onResume() {

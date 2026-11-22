@@ -17,6 +17,7 @@ import android.os.Looper
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
@@ -44,7 +45,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.coroutines.resume
 
-enum class Screen { Home, Apps, Favorites, Prayer, Quran, Hadith, Radio, Settings, About }
+enum class Screen { Home, Apps, Favorites, Prayer, Quran, Hadith, Radio, Settings, Background, About }
 enum class CityTarget { Prayer, Weather }
 
 sealed interface Dlg {
@@ -54,6 +55,7 @@ sealed interface Dlg {
     object Tune : Dlg
     object Lang : Dlg
     object Bg : Dlg
+    object Font : Dlg
     object BgUrl : Dlg
     object HijriAdj : Dlg
     object Volume : Dlg
@@ -123,12 +125,70 @@ class Engine(val app: Application) {
     // ---------- custom background ----------
     private val bgFile get() = java.io.File(app.filesDir, "bg_custom.img")
 
-    private fun decodeBg(): androidx.compose.ui.graphics.ImageBitmap? = try {
+    private val pendingFile get() = java.io.File(app.filesDir, "bg_pending.img")
+
+    // preview state of the wallpaper screen (nothing is saved until "apply")
+    var pvKind by mutableIntStateOf(0)
+    var pvAsset by mutableStateOf("")
+    var pvMode by mutableIntStateOf(0)
+    var pvDim by mutableIntStateOf(0)
+    var pvCustom by mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null)
+    private var pvPending = false
+    var pickImageLauncher: (() -> Unit)? = null
+
+    fun openBgScreen() {
+        pvKind = s.bg.value; pvAsset = s.bgAsset.value; pvMode = s.bgMode.value; pvDim = s.bgDim.value
+        pvCustom = customBg; pvPending = false
+        screen = Screen.Background
+    }
+
+    fun applyBg() {
+        if (pvKind == 8 && pvPending) {
+            try {
+                bgFile.delete()
+                if (!pendingFile.renameTo(bgFile)) { pendingFile.copyTo(bgFile, true); pendingFile.delete() }
+                customBg = pvCustom
+            } catch (ex: Exception) { toast(t("bg_failed")); return }
+            pvPending = false
+        }
+        s.bg.set(pvKind); s.bgAsset.set(pvAsset); s.bgMode.set(pvMode); s.bgDim.set(pvDim)
+        toast(t("bg_saved"))
+    }
+
+    fun cancelBg() { screen = Screen.Settings }
+
+    fun restoreBg() {
+        pvKind = 11; pvAsset = ""; pvMode = 0; pvDim = 0
+        applyBg()
+    }
+
+    fun pickImage() {
+        val l = pickImageLauncher
+        if (l == null) toast(t("no_file_browser")) else l()
+    }
+
+    fun onImagePicked(uri: android.net.Uri) {
+        scope.launch {
+            val bmp = withContext(Dispatchers.IO) {
+                try {
+                    app.contentResolver.openInputStream(uri)?.use { ins -> pendingFile.outputStream().use { ins.copyTo(it) } }
+                    decodeBg(pendingFile)
+                } catch (ex: Throwable) { null }
+            }
+            if (bmp != null) {
+                pvCustom = bmp; pvKind = 8; pvPending = true
+            } else {
+                pendingFile.delete(); toast(t("bg_unsupported"))
+            }
+        }
+    }
+
+    private fun decodeBg(f: java.io.File = bgFile): androidx.compose.ui.graphics.ImageBitmap? = try {
         val o = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        android.graphics.BitmapFactory.decodeFile(bgFile.path, o)
+        android.graphics.BitmapFactory.decodeFile(f.path, o)
         var sample = 1
         while (o.outWidth / (sample * 2) >= 1920) sample *= 2
-        val bmp = android.graphics.BitmapFactory.decodeFile(bgFile.path, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample })
+        val bmp = android.graphics.BitmapFactory.decodeFile(f.path, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample })
         bmp?.asImageBitmap()
     } catch (ex: Throwable) {
         null
@@ -151,6 +211,7 @@ class Engine(val app: Application) {
             }
             if (ok != null) {
                 customBg = ok
+                pvCustom = ok; pvKind = 8
                 s.bg.set(8)
             } else toast(t("bg_failed"))
         }
@@ -193,6 +254,7 @@ class Engine(val app: Application) {
         when {
             screen == Screen.Quran && q.open > 0 -> q.close()
             screen == Screen.Hadith && h.view != HView.Books -> h.back()
+            screen == Screen.Background -> screen = Screen.Settings
             else -> screen = Screen.Home
         }
     }
