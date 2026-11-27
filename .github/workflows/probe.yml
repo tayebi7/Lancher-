@@ -1,0 +1,35 @@
+name: probe-apis
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch samples
+        run: |
+          mkdir out; cd out
+          c() { curl -sL -m 40 -A "IslamicSmartTVLauncher/1.0" "$2" -o "$1" || echo "FAIL $1" > "$1"; }
+          c reciters.json "https://www.mp3quran.net/api/v3/reciters?language=ar"
+          c radios.json "https://www.mp3quran.net/api/v3/radios?language=ar"
+          c espn_eng1.json "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard"
+          c espn_leagues.json "https://site.api.espn.com/apis/site/v2/sports/soccer"
+          c espn_alg1.json "https://site.api.espn.com/apis/site/v2/sports/soccer/alg.1/scoreboard"
+          c espn_ucl.json "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard"
+          c er_usd.json "https://open.er-api.com/v6/latest/USD"
+          c bbc_ar.xml "https://feeds.bbci.co.uk/arabic/rss.xml"
+          c bbc_ar_sport.xml "https://feeds.bbci.co.uk/arabic/sports/rss.xml"
+          c fr24_ar.xml "https://www.france24.com/ar/rss"
+          c fr24_fr.xml "https://www.france24.com/fr/rss"
+          c fr24_en.xml "https://www.france24.com/en/rss"
+          c aljazeera.xml "https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84db769f779/73d0e1b4-532f-45ef-b135-bfdff8b8cab9"
+          c bbc_en.xml "https://feeds.bbci.co.uk/news/world/rss.xml"
+          c rb_dz.json "https://de1.api.radio-browser.info/json/stations/search?countrycode=DZ&hidebroken=true&limit=3"
+          for f in *; do echo "$f $(stat -c%s $f)"; done > sizes.txt; cat sizes.txt
+      - name: Publish
+        run: |
+          cd out; git init -q; git checkout -q -b api-probe
+          git config user.name ci; git config user.email ci@example.com
+          for f in *; do head -c 60000 "$f" > "$f.head"; rm "$f"; done
+          git add -A; git commit -qm probe
+          git push -f -q "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" api-probe
