@@ -25,11 +25,19 @@ jobs:
           c aljazeera.xml "https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84db769f779/73d0e1b4-532f-45ef-b135-bfdff8b8cab9"
           c bbc_en.xml "https://feeds.bbci.co.uk/news/world/rss.xml"
           c rb_dz.json "https://de1.api.radio-browser.info/json/stations/search?countrycode=DZ&hidebroken=true&limit=3"
+          c adhkar.json "https://cdn.jsdelivr.net/gh/rn0x/Adhkar-json@main/adhkar.json"
+          c adhkar2.json "https://raw.githubusercontent.com/rn0x/Adhkar-json/main/adhkar.json"
+          c rb_fr.json "https://de1.api.radio-browser.info/json/stations/search?language=french&hidebroken=true&order=clickcount&reverse=true&limit=3"
+          c rb_sa.json "https://de1.api.radio-browser.info/json/stations/search?countrycode=SA&hidebroken=true&order=clickcount&reverse=true&limit=3"
+          c espn_rangeucl.json "https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=20261125-20261201"
+          c espn_caf.json "https://site.api.espn.com/apis/site/v2/sports/soccer/caf.nations/scoreboard"
+          c espn_ksa.json "https://site.api.espn.com/apis/site/v2/sports/soccer/ksa.1/scoreboard"
+          c espn_fra1.json "https://site.api.espn.com/apis/site/v2/sports/soccer/fra.1/scoreboard"
           for f in *; do echo "$f $(stat -c%s $f)"; done > sizes.txt; cat sizes.txt
       - name: Publish
         run: |
           cd out; git init -q; git checkout -q -b api-probe
           git config user.name ci; git config user.email ci@example.com
-          for f in *; do head -c 60000 "$f" > "$f.head"; rm "$f"; done
+          for f in *; do head -c 200000 "$f" > "$f.head"; rm "$f"; done
           git add -A; git commit -qm probe
           git push -f -q "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" api-probe
