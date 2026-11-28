@@ -299,7 +299,7 @@ fun CurrencyScreen(e: Engine) {
                         Row(Modifier.fillMaxSize().padding(horizontal = 26.u), verticalAlignment = Alignment.CenterVertically) {
                             T(rt.code, 30, C.Gold, FontWeight.Bold, Modifier.width(120.u))
                             T(s("cur_" + rt.code), 24, C.White, modifier = Modifier.weight(1f), maxLines = 1)
-                            T("1 = ${df.format(rt.dzdPerUnit)} DZD", 30, C.White, FontWeight.Bold, maxLines = 1)
+                            T("\u2066" + "1 ${rt.code} = ${df.format(rt.dzdPerUnit)} DZD" + "\u2069", 30, C.White, FontWeight.Bold, maxLines = 1)
                         }
                     }
                 }

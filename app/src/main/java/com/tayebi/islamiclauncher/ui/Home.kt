@@ -212,10 +212,7 @@ fun WeatherChip(e: Engine) {
             } else {
                 T(weatherEmoji(w.code, w.isDay), 34)
                 T("${Math.round(w.temp)}°C", 32, C.White, FontWeight.Bold, maxLines = 1)
-                Column(Modifier.weight(1f)) {
-                    T(weatherText(w.code, lang), 18, C.White, maxLines = 1)
-                    T("💧${w.humidity}%  💨${Math.round(w.wind)}", 16, C.GoldSoft, maxLines = 1)
-                }
+                T(weatherText(w.code, lang), 20, C.White, modifier = Modifier.weight(1f), maxLines = 1)
             }
         }
     }
