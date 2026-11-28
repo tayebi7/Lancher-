@@ -237,13 +237,13 @@ fun NewsScreen(e: Engine) {
                 Button(s("retry"), Modifier.width(300.u)) { n.load(true) }
             }
             else -> LazyVerticalGrid(GridCells.Fixed(2), Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(14.u), verticalArrangement = Arrangement.spacedBy(14.u)) {
-                items(n.items.take(40)) { it ->
-                    FocusBox(Modifier.height(170.u), onClick = { n.reading = it }) {
+                items(n.items.take(40)) { ni ->
+                    FocusBox(Modifier.height(170.u), onClick = { n.reading = ni }) {
                         Row(Modifier.fillMaxSize().padding(12.u), horizontalArrangement = Arrangement.spacedBy(14.u)) {
-                            RemoteImage(it.image, Modifier.width(220.u).fillMaxHeight(), ContentScale.Crop, "📰")
+                            RemoteImage(ni.image, Modifier.width(220.u).fillMaxHeight(), ContentScale.Crop, "📰")
                             Column(Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween) {
-                                T(it.title, 24, C.White, FontWeight.Bold, maxLines = 4)
-                                T(it.source + if (it.dateMs > 0) "  •  " + fmtTime(it.dateMs) else "", 18, C.GoldSoft, maxLines = 1)
+                                T(ni.title, 24, C.White, FontWeight.Bold, maxLines = 4)
+                                T(ni.source + if (ni.dateMs > 0) "  •  " + fmtTime(ni.dateMs) else "", 18, C.GoldSoft, maxLines = 1)
                             }
                         }
                     }
@@ -285,7 +285,7 @@ fun CurrencyScreen(e: Engine) {
     ScreenFrame(s("currency")) {
         val r = c.rates
         Row(horizontalArrangement = Arrangement.spacedBy(12.u), verticalAlignment = Alignment.CenterVertically) {
-            T(s("currency_sub"), 24, C.GoldSoft, Modifier.weight(1f), maxLines = 2)
+            T(s("currency_sub"), 24, C.GoldSoft, FontWeight.Normal, Modifier.weight(1f), maxLines = 2)
             Button("⟳ " + s("refresh_now"), Modifier.width(320.u)) { c.load(true) }
         }
         if (r != null) T(s("updated") + ": " + r.updatedUtc.take(25) + "  •  " + s("source") + ": ExchangeRate-API", 20, C.GoldSoft, maxLines = 1)
