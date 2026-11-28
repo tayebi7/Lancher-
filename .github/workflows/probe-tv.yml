@@ -1,0 +1,43 @@
+name: probe-tv
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Algerian / Islamic TV streams
+        run: |
+          mkdir out; cd out
+          for u in dz ; do curl -sL -m 60 "https://iptv-org.github.io/iptv/countries/$u.m3u" -o $u.m3u; done
+          curl -sL -m 60 "https://iptv-org.github.io/iptv/categories/religious.m3u" -o religious.m3u
+          python3 - <<'PY'
+          import re,subprocess
+          res=[]
+          for f in ["dz.m3u","religious.m3u"]:
+              lines=open(f,errors="ignore").read().splitlines()
+              for i,l in enumerate(lines):
+                  if l.startswith("#EXTINF"):
+                      name=l.split(",")[-1].strip()
+                      logo=(re.search(r'tvg-logo="([^"]*)"',l) or [0,""])[1]
+                      country=(re.search(r'tvg-id="([^"]*)"',l) or [0,""])[1]
+                      url=lines[i+1].strip() if i+1<len(lines) else ""
+                      if not url.startswith("http"): continue
+                      if f=="religious.m3u" and not re.search(r"(قرآن|quran|koran|makkah|mecca|madina|sunna|islam|ٱ|الله|iqra|saudi|ksa|\.sa|\.dz)",(name+country+l).lower()): continue
+                      try:
+                          r=subprocess.run(["curl","-sL","-m","15","-A","Mozilla/5.0","-o","/tmp/b","-w","%{http_code} %{content_type}",url],capture_output=True,text=True,timeout=25).stdout
+                          body=open("/tmp/b","rb").read(300)
+                      except Exception as e:
+                          r="ERR"; body=b""
+                      ok = r.startswith("200") and (b"#EXTM3U" in body or b"#EXT" in body)
+                      res.append((f,name,url,logo,r,ok))
+          with open("tv_results.tsv","w") as o:
+              for x in res: o.write("\t".join(map(str,x))+"\n")
+          print(sum(1 for x in res if x[5]),"working of",len(res))
+          PY
+      - name: Publish
+        run: |
+          cd out; git init -q; git checkout -q -b tv-probe
+          git config user.name ci; git config user.email ci@example.com
+          git add -A; git commit -qm probe
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" tv-probe
