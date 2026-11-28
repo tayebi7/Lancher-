@@ -1,0 +1,2 @@
+    mResumedActivity: ActivityRecord{b5754cb u0 com.tayebi.islamiclauncher/.MainActivity t5}
+  ResumedActivity: ActivityRecord{b5754cb u0 com.tayebi.islamiclauncher/.MainActivity t5}
