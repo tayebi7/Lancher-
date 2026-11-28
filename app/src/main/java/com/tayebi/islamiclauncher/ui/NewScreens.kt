@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -102,7 +103,7 @@ fun NamesScreen(e: Engine) {
     var sel by remember { mutableStateOf<Int?>(null) }
     ScreenFrame(s("names")) {
         LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(14.u), verticalArrangement = Arrangement.spacedBy(14.u)) {
-            itemsIndexed(NamesOfAllah.ALL) { i, n ->
+            gridItemsIndexed(NamesOfAllah.all) { i, n ->
                 FocusBox(Modifier.height(190.u), onClick = { sel = if (sel == i) null else i }) {
                     Column(Modifier.fillMaxSize().padding(14.u), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                         T("${i + 1}", 20, C.GoldSoft)
@@ -142,7 +143,7 @@ fun AdhkarScreen(e: Engine) {
                 }
             }
             else -> LazyVerticalGrid(GridCells.Fixed(2), Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(14.u), verticalArrangement = Arrangement.spacedBy(14.u)) {
-                itemsIndexed(a.cats) { i, c ->
+                gridItemsIndexed(a.cats) { i, c ->
                     FocusBox(Modifier.height(90.u), onClick = { a.open = i }) {
                         Row(Modifier.fillMaxSize().padding(horizontal = 24.u), verticalAlignment = Alignment.CenterVertically) {
                             T("📿", 32, modifier = Modifier.width(56.u))

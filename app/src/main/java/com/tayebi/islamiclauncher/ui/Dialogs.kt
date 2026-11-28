@@ -50,6 +50,7 @@ import com.tayebi.islamiclauncher.MainActivity
 import com.tayebi.islamiclauncher.data.Geo
 import com.tayebi.islamiclauncher.data.Place
 import com.tayebi.islamiclauncher.data.QuranRepo
+import com.tayebi.islamiclauncher.data.ScoresRepo
 import com.tayebi.islamiclauncher.data.Settings as AppSettings
 import com.tayebi.islamiclauncher.i18n.LANGS
 import com.tayebi.islamiclauncher.i18n.METHODS
