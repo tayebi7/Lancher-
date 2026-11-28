@@ -40,6 +40,12 @@ fun LauncherApp(e: Engine, activity: MainActivity?) {
                         Screen.Quran -> QuranScreen(e)
                         Screen.Hadith -> HadithScreen(e)
                         Screen.Radio -> RadioScreen(e)
+                        Screen.Reciters -> RecitersScreen(e)
+                        Screen.Names -> NamesScreen(e)
+                        Screen.Adhkar -> AdhkarScreen(e)
+                        Screen.Scores -> ScoresScreen(e)
+                        Screen.News -> NewsScreen(e)
+                        Screen.Currency -> CurrencyScreen(e)
                         Screen.Settings -> SettingsScreen(e)
                         Screen.Background -> BgScreen(e)
                         Screen.About -> AboutScreen(e)
@@ -54,6 +60,14 @@ fun LauncherApp(e: Engine, activity: MainActivity?) {
                         Row(Modifier.padding(horizontal = 40.u, vertical = 18.u), verticalAlignment = Alignment.CenterVertically) {
                             T("🕌  $msg   •   ${s("stop")}", 36, C.White, androidx.compose.ui.text.font.FontWeight.Bold)
                         }
+                    }
+                }
+            }
+            e.news.reading?.let { NewsReaderDialog(e, it) }
+            e.alertBanner?.let { msg ->
+                Box(Modifier.fillMaxSize().padding(top = 18.u), contentAlignment = Alignment.TopCenter) {
+                    Box(Modifier.background(Color(0xF2B3261E), RoundedCornerShape(26.u)).padding(horizontal = 30.u, vertical = 10.u)) {
+                        T(msg, 24, C.White, androidx.compose.ui.text.font.FontWeight.Bold, maxLines = 2)
                     }
                 }
             }

@@ -127,8 +127,17 @@ class QuranState(private val e: Engine) {
         if (surah !in 1..114) return
         e.scope.launch {
             try {
-                val uri = repo.audioUri(e.s.reciter.value, surah)
-                e.audio.play(uri, surah)
+                val srv = e.s.reciterServer.value
+                if (srv.isNotBlank()) {
+                    val avail = e.s.reciterSurahs.value.split(",").mapNotNull { it.toIntOrNull() }
+                    if (avail.isNotEmpty() && surah !in avail) { e.toast(e.t("surah_unavailable")); return@launch }
+                    val f = repo.localAudio(srv.hashCode(), surah)
+                    val uri = if (f.exists() && f.length() > 0) android.net.Uri.fromFile(f) else android.net.Uri.parse(com.tayebi.islamiclauncher.data.ReciterRepo.audioUrl(srv, surah))
+                    e.audio.play(uri, surah)
+                } else {
+                    val uri = repo.audioUri(e.s.reciter.value, surah)
+                    e.audio.play(uri, surah)
+                }
             } catch (ex: Exception) {
                 e.toast(e.t("audio_error"))
             }
@@ -148,7 +157,12 @@ class QuranState(private val e: Engine) {
         dlProgress = 0
         e.scope.launch {
             try {
-                repo.download(e.s.reciter.value, n) { dlProgress = it }
+                val srv = e.s.reciterServer.value
+                if (srv.isNotBlank()) {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        com.tayebi.islamiclauncher.data.Http.download(com.tayebi.islamiclauncher.data.ReciterRepo.audioUrl(srv, n), repo.localAudio(srv.hashCode(), n)) { dlProgress = it }
+                    }
+                } else repo.download(e.s.reciter.value, n) { dlProgress = it }
                 e.toast(e.t("downloaded"))
             } catch (ex: Exception) {
                 e.toast(e.t("error_generic"))

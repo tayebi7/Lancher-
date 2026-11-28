@@ -32,13 +32,17 @@ class AppsRepo(private val ctx: Context) {
         /** Preferred default favourites, matched against what is actually installed. */
         val DEFAULTS = listOf(
             listOf("com.google.android.youtube.tv", "com.google.android.youtube"),
-            listOf("com.netflix.ninja", "com.netflix.mediaclient"),
+            listOf("com.google.android.youtube.tvkids", "com.google.android.youtube.kids"),
             listOf("net.mbc.shahid", "com.mbc.shahid"),
-            listOf("com.disney.disneyplus"),
-            listOf("com.android.vending")
+            listOf("com.disney.disneyplus")
+        )
+        /** Never suggested automatically (the user can still add them by hand). */
+        val EXCLUDED = setOf(
+            "com.netflix.ninja", "com.netflix.mediaclient", "com.android.vending",
+            "com.amazon.amazonvideo.livingroom", "com.amazon.avod.thirdpartyclient", "com.amazon.avod", "com.amazon.firetv.youtube"
         )
         val EXTRAS = listOf(
-            "com.amazon.amazonvideo.livingroom", "com.amazon.avod.thirdpartyclient", "org.xbmc.kodi",
+            "org.xbmc.kodi",
             "org.videolan.vlc", "com.spotify.tv.android", "com.google.android.youtube.tvmusic"
         )
     }

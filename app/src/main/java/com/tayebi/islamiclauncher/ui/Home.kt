@@ -58,11 +58,11 @@ fun Sidebar(e: Engine) {
     val items = listOf(
         Triple(Screen.Home, "🏠", "home"),
         Triple(Screen.Apps, "▦", "apps"),
-        Triple(Screen.Favorites, "⭐", "favorites"),
-        Triple(Screen.Prayer, "🕌", "prayer"),
-        Triple(Screen.Quran, "📖", "quran"),
-        Triple(Screen.Hadith, "📜", "hadith"),
+        Triple(Screen.Scores, "⚽", "scores"),
+        Triple(Screen.News, "📰", "news"),
+        Triple(Screen.Currency, "💱", "currency"),
         Triple(Screen.Radio, "📻", "radio"),
+        Triple(Screen.Favorites, "⭐", "favorites"),
         Triple(Screen.Settings, "⚙️", "settings")
     )
     Column(
@@ -110,8 +110,10 @@ fun TopBar(e: Engine) {
         Spacer(Modifier.width(24.u))
         Clock(e)
         Spacer(Modifier.weight(1f))
+        WeatherChip(e)
+        Spacer(Modifier.width(18.u))
         FocusBox(
-            Modifier.height(64.u).width(380.u),
+            Modifier.height(64.u).width(300.u),
             shape = RoundedCornerShape(32.u),
             onClick = { e.dlg = Dlg.City(CityTarget.Prayer) }
         ) {
@@ -121,10 +123,6 @@ fun TopBar(e: Engine) {
                 T(e.prayerPlace().short(), 28, C.White, FontWeight.Medium, Modifier.weight(1f), maxLines = 1)
                 T("▾", 26, C.Gold)
             }
-        }
-        Spacer(Modifier.width(18.u))
-        FocusBox(Modifier.size(64.u), shape = RoundedCornerShape(32.u), onClick = { e.go(Screen.Settings) }) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { T("⚙️", 34) }
         }
         Spacer(Modifier.width(18.u))
         Box(Modifier.size(64.u), contentAlignment = Alignment.Center) {
@@ -204,6 +202,26 @@ fun StaleLine(ms: Long) {
 }
 
 @Composable
+fun WeatherChip(e: Engine) {
+    val lang = LocalLang.current
+    val w = e.weather
+    FocusBox(Modifier.height(64.u).width(340.u), shape = RoundedCornerShape(32.u), onClick = { e.dlg = Dlg.City(CityTarget.Weather) }) {
+        Row(Modifier.fillMaxSize().padding(horizontal = 18.u), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.u)) {
+            if (w == null) {
+                T(if (e.weatherFailed) s("weather_none") else s("loading"), 22, C.GoldSoft, maxLines = 1)
+            } else {
+                T(weatherEmoji(w.code, w.isDay), 34)
+                T("${Math.round(w.temp)}°C", 32, C.White, FontWeight.Bold, maxLines = 1)
+                Column(Modifier.weight(1f)) {
+                    T(weatherText(w.code, lang), 18, C.White, maxLines = 1)
+                    T("💧${w.humidity}%  💨${Math.round(w.wind)}", 16, C.GoldSoft, maxLines = 1)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun WeatherCard(e: Engine, modifier: Modifier = Modifier) {
     val lang = LocalLang.current
     val w = e.weather
@@ -267,7 +285,7 @@ fun AppTile(app: AppInfo, modifier: Modifier, requester: FocusRequester? = null,
 
 @Composable
 fun AppsRow(e: Engine, firstFocus: FocusRequester) {
-    val favs = e.favApps().take(6)
+    val favs = e.favApps().take(7)
     // Keep the tile order left-to-right regardless of the UI language direction.
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(Modifier.fillMaxWidth().height(150.u), horizontalArrangement = Arrangement.spacedBy(16.u)) {
@@ -279,18 +297,7 @@ fun AppsRow(e: Engine, firstFocus: FocusRequester) {
                     onClick = { e.launch(a) }
                 )
             }
-            repeat(6 - favs.size) { Spacer(Modifier.weight(1f)) }
-            FocusBox(
-                Modifier.weight(1f).fillMaxHeight(),
-                shape = RoundedCornerShape(22.u),
-                requester = if (favs.isEmpty()) firstFocus else null,
-                onClick = { e.go(Screen.Apps) }
-            ) {
-                Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    T("▦", 64, C.GoldSoft)
-                    T(s("all_apps"), 24, C.White, FontWeight.Bold, maxLines = 1)
-                }
-            }
+            repeat(7 - favs.size) { Spacer(Modifier.weight(1f)) }
         }
     }
 }
@@ -313,13 +320,23 @@ fun FeatureCard(title: String, sub: String, icon: String, brush: Brush, modifier
 
 @Composable
 fun BottomCards(e: Engine) {
-    val quranBrush = Brush.horizontalGradient(listOf(Color(0xE60A3D31), Color(0xE6071A3E)))
     val hadithBrush = Brush.horizontalGradient(listOf(Color(0xE6341A5E), Color(0xE6071A3E)))
-    val moreBrush = Brush.horizontalGradient(listOf(Color(0xE65A3A0E), Color(0xE6071A3E)))
-    Row(Modifier.fillMaxWidth().height(170.u), horizontalArrangement = Arrangement.spacedBy(20.u)) {
-        FeatureCard(s("about_app"), "", "ℹ️", moreBrush, Modifier.weight(1f).fillMaxHeight()) { e.go(Screen.About) }
+    val adhkarBrush = Brush.horizontalGradient(listOf(Color(0xE65A3A0E), Color(0xE6071A3E)))
+    Row(Modifier.fillMaxWidth().height(140.u), horizontalArrangement = Arrangement.spacedBy(20.u)) {
         FeatureCard(s("hadith"), s("read_search"), "📜", hadithBrush, Modifier.weight(1f).fillMaxHeight()) { e.go(Screen.Hadith) }
-        FeatureCard(s("quran"), s("read_listen"), "📖", quranBrush, Modifier.weight(1f).fillMaxHeight()) { e.go(Screen.Quran) }
+        FeatureCard(s("adhkar"), s("adhkar_sub"), "📿", adhkarBrush, Modifier.weight(1f).fillMaxHeight()) { e.go(Screen.Adhkar) }
+    }
+}
+
+@Composable
+fun VerticalCard(title: String, sub: String, icon: String, brush: Brush, modifier: Modifier, onClick: () -> Unit) {
+    FocusBox(modifier, shape = RoundedCornerShape(26.u), onClick = onClick) {
+        Box(Modifier.fillMaxSize().background(brush))
+        Column(Modifier.fillMaxSize().padding(14.u), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            T(icon, 72)
+            T(title, 36, C.White, FontWeight.Bold, align = TextAlign.Center, maxLines = 1)
+            T(sub, 22, C.GoldSoft, align = TextAlign.Center, maxLines = 1)
+        }
     }
 }
 
@@ -330,14 +347,16 @@ fun HomeScreen(e: Engine) {
         delay(150)
         runCatching { first.requestFocus() }
     }
+    val quranBrush = Brush.verticalGradient(listOf(Color(0xE60A3D31), Color(0xE6071A3E)))
+    val namesBrush = Brush.verticalGradient(listOf(Color(0xE6143F66), Color(0xE6071A3E)))
     Column(Modifier.fillMaxSize().padding(start = 34.u, end = 34.u, top = 66.u, bottom = 66.u)) {
         TopBar(e)
         Row(Modifier.weight(1f).fillMaxWidth().padding(vertical = 12.u), horizontalArrangement = Arrangement.spacedBy(20.u)) {
-            Column(Modifier.weight(0.28f).fillMaxHeight()) {
-                WeatherCard(e, Modifier.fillMaxWidth().weight(0.78f))
-                Spacer(Modifier.weight(0.22f))
+            Column(Modifier.weight(0.24f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(16.u)) {
+                VerticalCard(s("quran"), s("read_listen"), "📖", quranBrush, Modifier.fillMaxWidth().weight(1f)) { e.go(Screen.Quran) }
+                VerticalCard(s("names"), s("names_sub"), "✨", namesBrush, Modifier.fillMaxWidth().weight(1f)) { e.go(Screen.Names) }
             }
-            Spacer(Modifier.weight(0.42f))
+            Spacer(Modifier.weight(0.46f))
             PrayerPanel(e, Modifier.weight(0.30f).fillMaxHeight())
         }
         AppsRow(e, first)

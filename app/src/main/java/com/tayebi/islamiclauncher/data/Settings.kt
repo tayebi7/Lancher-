@@ -47,6 +47,20 @@ class Settings(ctx: Context) {
     val font = IntPref(sp, "font", 0)
     val volume = IntPref(sp, "volume", 80)
 
+    // Quran reciter chosen from the mp3quran.net directory (empty server = legacy Quran.com reciter)
+    val reciterName = StrPref(sp, "reciter_name", "")
+    val reciterServer = StrPref(sp, "reciter_server", "")
+    val reciterSurahs = StrPref(sp, "reciter_surahs", "")
+    val reciterFavs = StrPref(sp, "reciter_favs", "")   // lines: name|server|surahs
+
+    // Radio / news / scores / currencies
+    val radioFavs = StrPref(sp, "radio_favs", "")       // lines: name|url|logo
+    val newsCat = IntPref(sp, "news_cat", 0)
+    val scoreLeagues = StrPref(sp, "score_leagues", "uefa.champions,eng.1,esp.1,ita.1,ger.1,fra.1,ksa.1,caf.nations")
+    val scoreTeams = StrPref(sp, "score_teams", "")     // favourite team names, one per line
+    val goalAlerts = BoolPref(sp, "goal_alerts", true)
+    val goalSound = BoolPref(sp, "goal_sound", true)
+
     // Prayer
     val method = IntPref(sp, "method", 19)          // 19 = Algeria (Aladhan)
     val school = IntPref(sp, "school", 0)           // 0 = Shafi/Maliki/Hanbali, 1 = Hanafi

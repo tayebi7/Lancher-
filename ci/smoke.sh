@@ -19,7 +19,7 @@ grep -E "FATAL|AndroidRuntime|Engine|islamiclauncher" out/logcat_full.txt | head
 echo "=========== PID ==========="
 cat out/pid.txt
 # move focus around and capture more screens
-for sc in About Prayer Quran Hadith Radio Settings Background Apps; do
+for sc in About Prayer Quran Hadith Radio Reciters Names Adhkar Scores News Currency Settings Background Apps; do
   adb shell am start -n $PKG/.MainActivity --es screen $sc
   sleep 8
   adb exec-out screencap -p > out/screenshot-$sc.png

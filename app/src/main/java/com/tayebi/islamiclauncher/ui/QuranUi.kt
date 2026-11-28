@@ -48,10 +48,11 @@ private fun SurahList(e: Engine) {
     }
     ScreenFrame(s("quran")) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.u), verticalAlignment = Alignment.CenterVertically) {
-            TextInput(query, { query = it }, s("search_surah"), Modifier.width(700.u), onSearch = {})
-            Button(s("search_ayah"), Modifier.width(380.u)) { q.searchAyahs(query) }
+            TextInput(query, { query = it }, s("search_surah"), Modifier.width(520.u), onSearch = {})
+            Button(s("search_ayah"), Modifier.width(300.u)) { q.searchAyahs(query) }
+            Button("🎙 " + s("search_reciter"), Modifier.width(360.u)) { e.go(com.tayebi.islamiclauncher.Screen.Reciters) }
             if (e.s.lastSurah.value > 0) {
-                Button(s("continue_reading"), Modifier.width(380.u)) { q.openSurah(e.s.lastSurah.value, e.s.lastAyah.value) }
+                Button(s("continue_reading"), Modifier.width(300.u)) { q.openSurah(e.s.lastSurah.value, e.s.lastAyah.value) }
             }
         }
         Spacer(Modifier.height(14.u))
@@ -105,12 +106,12 @@ private fun Reader(e: Engine) {
         if (q.verses.isNotEmpty() && q.startAyah in q.verses.indices) state.scrollToItem(q.startAyah)
     }
     val playingThis = e.audio.surah == q.open && e.audio.isPlaying
-    val downloaded = q.repo.localAudio(e.s.reciter.value, q.open).exists()
+    val downloaded = q.repo.localAudio(e.s.reciterServer.value.takeIf { it.isNotBlank() }?.hashCode() ?: e.s.reciter.value, q.open).exists()
     ScreenFrame((chapter?.nameAr ?: "") + "  •  " + q.open) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.u), modifier = Modifier.fillMaxWidth()) {
             Button(s("back"), Modifier.weight(0.7f)) { q.close() }
             Button(if (playingThis) "⏸ " + s("pause") else "▶ " + s("play"), Modifier.weight(1f)) { q.togglePlay() }
-            Button(QuranRepo.RECITERS.firstOrNull { it.first == e.s.reciter.value }?.second ?: s("reciter"), Modifier.weight(1.6f)) { e.dlg = Dlg.Reciter }
+            Button("🎙 " + (e.s.reciterName.value.ifBlank { QuranRepo.RECITERS.firstOrNull { it.first == e.s.reciter.value }?.second ?: s("reciter") }), Modifier.weight(1.6f)) { e.go(com.tayebi.islamiclauncher.Screen.Reciters) }
             Button(if (q.dlProgress >= 0 && q.dlSurah == q.open) sf("downloading", q.dlProgress) else if (downloaded) "✓ " + s("downloaded") else "⬇ " + s("download"), Modifier.weight(1.2f)) { q.download() }
             Button(s("translation") + if (e.s.showTr.value) " ✓" else "", Modifier.weight(0.9f)) { q.toggleTr() }
             Button(s("tafsir") + if (e.s.showTafsir.value) " ✓" else "", Modifier.weight(0.8f)) { q.toggleTafsir() }

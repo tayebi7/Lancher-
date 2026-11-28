@@ -68,14 +68,14 @@ fun sf(key: String, vararg a: Any): String = com.tayebi.islamiclauncher.i18n.trf
 
 @OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
 private fun vf(res: Int): FontFamily = FontFamily(
-    listOf(400 to FontWeight.Normal, 500 to FontWeight.Medium, 600 to FontWeight.SemiBold, 700 to FontWeight.Bold).map { (w, fw) ->
+    listOf(500 to FontWeight.Normal, 600 to FontWeight.Medium, 700 to FontWeight.SemiBold, 700 to FontWeight.Bold).map { (w, fw) ->
         Font(res, fw, variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(androidx.compose.ui.text.font.FontVariation.weight(w)))
     }
 )
 
 object Fonts {
     val Tajawal = FontFamily(
-        Font(R.font.tajawal_regular, FontWeight.Normal),
+        Font(R.font.tajawal_medium, FontWeight.Normal),
         Font(R.font.tajawal_medium, FontWeight.Medium),
         Font(R.font.tajawal_bold, FontWeight.Bold),
         Font(R.font.tajawal_bold, FontWeight.SemiBold)

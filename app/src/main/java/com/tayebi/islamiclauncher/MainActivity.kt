@@ -21,6 +21,8 @@ class MainActivity : ComponentActivity() {
         locCb = null
     }
 
+    private val notifPerm = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
     private val imagePicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             try {
@@ -50,6 +52,11 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         hideBars()
         intent.getStringExtra("screen")?.let { n -> Screen.values().firstOrNull { it.name.equals(n, true) }?.let { engine.go(it) } }
+        engine.notifPermLauncher = {
+            if (android.os.Build.VERSION.SDK_INT >= 33 &&
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) try { notifPerm.launch(Manifest.permission.POST_NOTIFICATIONS) } catch (_: Exception) { }
+        }
         setContent { LauncherApp(engine, this) }
     }
 

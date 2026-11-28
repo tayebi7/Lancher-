@@ -113,7 +113,7 @@ fun SettingsScreen(e: Engine) {
         Row3(s("language"), LANGS.first { it.first == lang }.second) { e.dlg = Dlg.Lang },
         Row3(s("internet"), if (e.online) s("connected") else s("disconnected")) { net() },
         Row3(s("refresh_now"), "⟳") { e.refreshAll() },
-        Row3(s("about_app"), "›") { e.go(com.tayebi.islamiclauncher.Screen.About) }
+        Row3(s("about_app"), "Islamic TV Launcher  ›") { e.go(com.tayebi.islamiclauncher.Screen.About) }
     )
     ScreenFrame(s("settings")) {
         LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.u)) {

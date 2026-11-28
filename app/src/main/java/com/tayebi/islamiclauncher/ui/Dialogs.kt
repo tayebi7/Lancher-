@@ -366,6 +366,15 @@ fun Dialogs(e: Engine, activity: MainActivity?) {
             { e.s.reciter.set(it.toInt()); e.dlg = null }, { e.dlg = null }
         )
         Dlg.PickFav -> PickFavDialog(e)
+        Dlg.MultiLeagues -> ToggleDialog(
+            s("leagues"), ScoresRepo.LEAGUES.map { it.slug to (when (lang) { "ar" -> it.ar; "fr" -> it.fr; else -> it.en }) },
+            e.scores.leagues().toSet(), { e.scores.toggleLeague(it) }, { e.dlg = null; e.scores.load() }
+        )
+        Dlg.MultiTeams -> ToggleDialog(
+            s("fav_teams"),
+            (e.scores.matches.flatMap { listOf(it.home, it.away) }.toSet() + e.scores.favTeams()).sorted().map { it to it },
+            e.scores.favTeams(), { e.scores.toggleTeam(it) }, { e.dlg = null }
+        )
         is Dlg.AppMenu -> {
             val a = d.app
             val inFav = e.favPkgs().contains(a.pkg)

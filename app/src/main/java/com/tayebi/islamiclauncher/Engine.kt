@@ -45,7 +45,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.coroutines.resume
 
-enum class Screen { Home, Apps, Favorites, Prayer, Quran, Hadith, Radio, Settings, Background, About }
+enum class Screen { Home, Apps, Favorites, Prayer, Quran, Hadith, Radio, Reciters, Names, Adhkar, Scores, News, Currency, Settings, Background, About }
 enum class CityTarget { Prayer, Weather }
 
 sealed interface Dlg {
@@ -63,6 +63,8 @@ sealed interface Dlg {
     object Developer : Dlg
     object Reciter : Dlg
     object PickFav : Dlg
+    object MultiLeagues : Dlg
+    object MultiTeams : Dlg
     data class AppMenu(val app: AppInfo, val inFavs: Boolean) : Dlg
 }
 
@@ -77,6 +79,20 @@ class Engine(val app: Application) {
     val q = QuranState(this)
     val h = HadithState(this)
     val radio = RadioState(this)
+    val reciters = ReciterState(this)
+    val adhkar = AdhkarState(this)
+    val news = NewsState(this)
+    val currency = CurrencyState(this)
+    val scores = ScoresState(this)
+    var alertBanner by mutableStateOf<String?>(null)
+    private var alertToken = 0
+    var notifPermLauncher: (() -> Unit)? = null
+
+    fun showAlert(msg: String) {
+        alertBanner = msg
+        val tok = ++alertToken
+        scope.launch { delay(9000); if (alertToken == tok) alertBanner = null }
+    }
 
     var screen by mutableStateOf(Screen.Home)
     var dlg by mutableStateOf<Dlg?>(null)
@@ -104,7 +120,7 @@ class Engine(val app: Application) {
     private var weatherJob: Job? = null
 
     init {
-        audio.onError = { toast(t(it)) }
+        audio.onError = { k -> if (radio.current != null) { radio.playError = true; toast(t("radio_unavailable")) } else toast(t(k)) }
         loadCustomBg()
         watchNetwork()
         watchPackages()
@@ -249,6 +265,11 @@ class Engine(val app: Application) {
         if (sc == Screen.Background) { openBgScreen(); return }
         screen = sc
         if (sc == Screen.Quran) q.loadChapters()
+        if (sc == Screen.Reciters) reciters.load()
+        if (sc == Screen.Adhkar) adhkar.load()
+        if (sc == Screen.News) news.load()
+        if (sc == Screen.Currency) currency.load()
+        if (sc == Screen.Scores) { s.sp.edit().putBoolean("scores_used", true).apply(); scores.load(); if (s.goalAlerts.value) notifPermLauncher?.invoke() }
     }
 
     fun back() {
@@ -256,6 +277,7 @@ class Engine(val app: Application) {
             screen == Screen.Quran && q.open > 0 -> q.close()
             screen == Screen.Hadith && h.view != HView.Books -> h.back()
             screen == Screen.Background -> screen = Screen.Settings
+            screen == Screen.Reciters -> screen = Screen.Quran
             else -> screen = Screen.Home
         }
     }
@@ -351,19 +373,21 @@ class Engine(val app: Application) {
 
     private fun ensureDefaultFavs() {
         if (installed.isEmpty()) return
-        if (s.favorites.value != Settings.UNSET && s.favVer.value >= 2) return
+        val auto = s.sp.getBoolean("fav_auto", true)
+        if (s.favorites.value != Settings.UNSET && (s.favVer.value >= 3 || !auto)) return
         val out = ArrayList<String>()
         fun addFirst(group: List<String>) {
             group.firstOrNull { p -> p !in out && installed.any { it.pkg == p } }?.let { out.add(it) }
         }
-        AppsRepo.DEFAULTS.take(4).forEach { addFirst(it) }
-        installed.firstOrNull { it.label.contains("iptv", true) && it.pkg !in out }?.let { out.add(it.pkg) }
-        addFirst(AppsRepo.DEFAULTS.last())
+        AppsRepo.DEFAULTS.forEach { addFirst(it) }
+        installed.firstOrNull { it.label.contains("iptv", true) && it.pkg !in out && it.pkg !in AppsRepo.EXCLUDED }?.let { out.add(it.pkg) }
         AppsRepo.EXTRAS.forEach { addFirst(listOf(it)) }
-        for (a in installed) if (out.size < 6 && a.banner != null && a.pkg !in out) out.add(a.pkg)
-        for (a in installed) if (out.size < 6 && a.pkg !in out) out.add(a.pkg)
-        s.favorites.set(out.take(6).joinToString("\n"))
-        s.favVer.set(2)
+        val ok = installed.filter { it.pkg !in AppsRepo.EXCLUDED }
+        for (a in ok) if (out.size < 7 && a.banner != null && a.pkg !in out) out.add(a.pkg)
+        for (a in ok) if (out.size < 7 && a.pkg !in out) out.add(a.pkg)
+        s.favorites.set(out.take(7).joinToString("\n"))
+        s.sp.edit().putBoolean("fav_auto", true).apply()
+        s.favVer.set(3)
     }
 
     fun favPkgs(): List<String> {
@@ -373,10 +397,14 @@ class Engine(val app: Application) {
 
     fun favApps(): List<AppInfo> = favPkgs().mapNotNull { p -> installed.firstOrNull { it.pkg == p } }
 
-    private fun saveFavs(l: List<String>) = s.favorites.set(l.joinToString("\n"))
+    private fun saveFavs(l: List<String>) {
+        s.favorites.set(l.joinToString("\n"))
+        s.sp.edit().putBoolean("fav_auto", false).apply()
+    }
 
     fun toggleFav(pkg: String) {
-        val l = favPkgs()
+        // The first manual choice replaces the automatic suggestions.
+        val l = if (s.sp.getBoolean("fav_auto", true)) emptyList() else favPkgs()
         saveFavs(if (pkg in l) l - pkg else l + pkg)
     }
 
@@ -465,6 +493,7 @@ class Engine(val app: Application) {
         val wGap = if (weatherFailed || weather == null) 120_000L else 30 * 60_000L
         if (n - lastWeatherAttempt > wGap) refreshWeather()
         checkAdhan(n)
+        if (s.sp.getBoolean("scores_used", false)) scores.poll(n)
     }
 
 

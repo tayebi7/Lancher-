@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +46,7 @@ fun AboutScreen(e: Engine) {
     val clip = LocalClipboardManager.current
     val tCopied = s("copied")
     val tNoMail = sf("no_mail_app", DEV_EMAIL)
+    val versionName = remember { try { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName ?: "" } catch (t: Throwable) { "" } }
     ScreenFrame("عن البرنامج • About") {
         LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(14.u)) {
             item {
@@ -52,13 +54,16 @@ fun AboutScreen(e: Engine) {
                     Image(painterResource(R.drawable.banner), null, Modifier.size(width = 380.u, height = 214.u))
                     Spacer(Modifier.width(30.u))
                     Column(Modifier.weight(1f)) {
-                        T("Islamic Smart TV Launcher", 34, C.GoldSoft, FontWeight.Bold)
-                        T("v1.0.0", 22, C.Muted)
+                        T("Islamic TV Launcher", 38, C.GoldSoft, FontWeight.Bold)
+                        T(s("version") + " " + versionName, 24, C.Muted)
+                        T(s("about_desc"), 24, C.White)
                         Spacer(Modifier.height(8.u))
                         T("Tayebi Abdelghani", 52, C.White, FontWeight.Bold)
                         T("🇩🇿 Algeria  •  الجزائر", 30, C.White)
                         T(DEV_EMAIL, 30, C.Gold)
                         Spacer(Modifier.height(10.u))
+                        Button(s("whatsapp"), Modifier.width(520.u)) { openWhatsApp(ctx, e, clip) }
+                        Spacer(Modifier.height(8.u))
                         Button(s("contact"), Modifier.width(520.u)) {
                             try {
                                 ctx.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$DEV_EMAIL")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -101,4 +106,20 @@ fun AboutScreen(e: Engine) {
             }
         }
     }
+}
+
+const val DEV_WHATSAPP = "213558274605"   // 00213558274605
+
+private fun openWhatsApp(ctx: android.content.Context, e: Engine, clip: androidx.compose.ui.platform.ClipboardManager) {
+    val uri = Uri.parse("https://wa.me/$DEV_WHATSAPP")
+    for (pkg in listOf("com.whatsapp", "com.whatsapp.w4b", null)) {
+        try {
+            val i = Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            if (pkg != null) i.setPackage(pkg)
+            ctx.startActivity(i)
+            return
+        } catch (ex: Exception) { /* try next */ }
+    }
+    clip.setText(AnnotatedString("+$DEV_WHATSAPP"))
+    e.toast(e.t("whatsapp_missing") + "  +$DEV_WHATSAPP")
 }
